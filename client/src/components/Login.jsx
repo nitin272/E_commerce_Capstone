@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logo.png'; 
-import { Button, TextField, InputAdornment, IconButton } from '@mui/material/';
+import { Button, TextField, InputAdornment } from '@mui/material/';
 import { Google, Email, LockOpen } from '@mui/icons-material';
 import LoginIcon from '@mui/icons-material/Login';
 import { toast, ToastContainer } from 'react-toastify';
@@ -18,13 +18,12 @@ const Login = () => {
   const onLoginBtn = async (e) => {
     e.preventDefault();
     try {
-      // Send login request to backend
+      // Send login request to backend with credentials
       const response = await axios.post(`${apiUrl}/login`, {
         username: email,
         password
-      });
-      // Store token in localStorage
-      localStorage.setItem("token", response.data.token);
+      }, { withCredentials: true }); // Added withCredentials
+
       toast.success('Login successful');
       navigate('/'); // Redirect to home page
     } catch (error) {
@@ -40,7 +39,8 @@ const Login = () => {
         try {
           // Check token validity
           const response = await axios.get(`${apiUrl}/login/success`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': `Bearer ${token}` },
+            withCredentials: true // Ensure credentials are included
           });
           if (response.data.user) {
             navigate('/'); // Redirect if authenticated

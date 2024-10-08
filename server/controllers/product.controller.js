@@ -190,5 +190,5 @@ exports.deleteProduct = async (req, res) => {
         res.json({ message: 'Product deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }
+    }4
 };
