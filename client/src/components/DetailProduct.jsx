@@ -10,15 +10,17 @@ import Footer from './footer.jsx';
 const ProductDetail = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
-    const [isEnquiring, setIsEnquiring] = useState(false); // Added state for enquiry feedback
+    const [isEnquiring, setIsEnquiring] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/products/${id}`);
+                const response = await axios.get(`${apiUrl}/products/${id}`, {
+                    withCredentials: true
+                });
                 setProduct(response.data);
             } catch (err) {
                 setError('Failed to fetch product details.');
@@ -33,23 +35,23 @@ const ProductDetail = () => {
 
     if (loading) return <div className="text-center p-5"><CircularProgress /></div>;
     if (error) return <div className="text-center p-5">Error: {error}</div>;
+
     const handleEnquiry = async (product) => {
         setIsEnquiring(true);
         try {
             const { productName, category, description, productImgUrls, _id } = product;
-            const productUrl = `${window.location.origin}/products/${_id}`; // Construct the product detail URL
-            const imageUrl = productImgUrls[0]; // First image URL
-    
-            // Improved WhatsApp message
+            const productUrl = `${window.location.origin}/products/${_id}`;
+            const imageUrl = productImgUrls[0];
+
             const whatsappMessage = `Hello! 🌟\n\n` +
                 `I'm interested in learning more about the following product:\n\n` +
                 `*Product Name:* ${productName}\n` +
                 `*Category:* ${category}\n` +
-                `*Description:* ${description.slice(0, 100)}...\n\n` + // Limiting description to 100 characters
-                `*Product Link:* ${productUrl}\n` + // Product detail link
+                `*Description:* ${description.slice(0, 100)}...\n\n` +
+                `*Product Link:* ${productUrl}\n` +
                 `*Image:* ${imageUrl}\n\n` +
                 `Could you please provide more details? Thank you! 🙏`;
-    
+
             const encodedMessage = encodeURIComponent(whatsappMessage);
             const whatsappUrl = `https://wa.me/${9413262126}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
@@ -59,6 +61,7 @@ const ProductDetail = () => {
             setIsEnquiring(false);
         }
     };
+
     const stockStatus = (stock) => {
         if (stock === 0) {
             return { status: 'No stock available', color: 'error' };
@@ -74,44 +77,55 @@ const ProductDetail = () => {
     return (
         <>
             <Navbar />
-            <div className="max-w-7xl mx-auto px-4 mt-20 sm:mt-28">
-                {/* Centered Product Name */}
-                <Typography variant="h3" component="h1" align="center" gutterBottom style={{ fontWeight: 'bold', color: '#333', textShadow: '1px 1px 1px rgba(255, 255, 255, 0.7)' ,marginRight:'35vh'}}>
+            <div className="max-w-7xl mx-auto px-4 mt-12" style={{marginTop:"15vh"}}>
+                <Typography
+                    variant="h3"
+                    component="h1"
+                    align="center"
+                    gutterBottom
+                    style={{
+                        fontWeight: 'bold',
+                        color: '#333',
+                        textShadow: '1px 1px 1px rgba(255, 255, 255, 0.7)',
+                        marginBottom: '20px',
+                    }}
+                >
                     {product.productName}
                 </Typography>
 
-                {/* Carousel for Product Images */}
                 <Carousel className="mt-4">
                     {product.productImgUrls.map((img, index) => (
                         <div key={index} className="flex justify-center">
-                            <img 
-                                src={img} 
-                                alt={`${product.productName} - Image ${index + 1}`} 
-                                style={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.2)', width: '100%', maxHeight: '400px', objectFit: 'cover' }} 
+                            <img
+                                src={img}
+                                alt={`${product.productName} - Image ${index + 1}`}
+                                style={{
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                                    width: '100%',
+                                    maxHeight: '400px',
+                                    objectFit: 'cover',
+                                }}
                             />
                         </div>
                     ))}
                 </Carousel>
 
-                {/* Product Details Card */}
-                <Card elevation={3} style={{ marginTop: '24px', borderRadius: '12px', backgroundColor: '#f9f9f9' }}>
+                <Card elevation={6} style={{ marginTop: '24px', borderRadius: '12px', backgroundColor: '#f9f9f9' }}>
                     <CardContent>
                         <Grid container spacing={2}>
-                            {/* Category */}
                             <Grid item xs={12} sm={4}>
                                 <Typography variant="subtitle1" style={{ fontWeight: '600' }}>
                                     <strong>Category:</strong> {product.category}
                                 </Typography>
                             </Grid>
 
-                            {/* Stock */}
                             <Grid item xs={12} sm={4}>
                                 <Typography variant="subtitle1" style={{ fontWeight: '600', color: color }}>
                                     <strong>Stock:</strong> {status}
                                 </Typography>
                             </Grid>
 
-                            {/* Price */}
                             <Grid item xs={12} sm={4}>
                                 <Typography variant="subtitle1" style={{ fontWeight: '600' }}>
                                     <strong>Price:</strong> ${product.price}
@@ -119,21 +133,24 @@ const ProductDetail = () => {
                             </Grid>
                         </Grid>
 
-                        {/* Description */}
                         <Typography variant="body1" color="textSecondary" paragraph style={{ marginTop: '16px' }}>
                             {product.description}
                         </Typography>
 
-                        {/* Buy Now Button */}
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px',marginLeft:'35vh' }}>
-                        <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={() => handleEnquiry(product)}
-                                    disabled={isEnquiring}
-                                >
-                                    {isEnquiring ? <CircularProgress size={24} /> : 'Enquiry'}
-                                </Button>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => handleEnquiry(product)}
+                                disabled={isEnquiring}
+                                style={{
+                                    padding: '10px 20px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                {isEnquiring ? <CircularProgress size={24} /> : 'Enquiry'}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>

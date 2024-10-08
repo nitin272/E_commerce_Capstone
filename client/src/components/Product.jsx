@@ -14,7 +14,7 @@ const Product = () => {
     const [alert, setAlert] = useState('');
     const [loading, setLoading] = useState(true);
     const [isEnquiring, setIsEnquiring] = useState(false); // Added state for enquiry feedback
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
     const navigate = useNavigate();
 
     useEffect(() => {

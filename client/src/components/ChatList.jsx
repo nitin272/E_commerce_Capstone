@@ -22,66 +22,67 @@ const ChatList = () => {
     const { messages } = getMessages(user);
     const lastMessageRef = useRef();
     const { onlineUser } = useSocketContext();
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
-  
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
+
     useListenMessage();
-  
+
     const { state } = location;
-    const initialUserId = state?.userId;
-    console.log('initialUserId', initialUserId);
-    
+    const initialUserId = state?.userId; // Get userId from location state
+    console.log('initialUserId:', initialUserId); // Log the initialUserId for debugging
+
     useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const response = await axios.get(`${apiUrl}/login/success`, {
-            withCredentials: true,
-          });
-          setUser(response.data.user);
-        } catch (error) {
-          navigate('/error');
-        }
-      };
-  
-      const fetchList = async () => {
-        try {
-          const headers = {
-            'Content-Type': 'application/json',
-          };
-  
-          // Admins can fetch the full list of users
-          if (user?.role === 'admin') {
-            const response = await axios.get(`${apiUrl}/users`, { headers, withCredentials: true });
-            const filteredList = response.data.filter(item => item._id !== user._id); // Exclude self
-            setList(filteredList);
-  
-            // If an initialUserId exists, find and set the conversation
-            if (initialUserId) {
-              const conversation = filteredList.find(item => item._id === initialUserId);
-              if (conversation) {
-                setSelectedConversation(conversation);
-              }
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/login/success`, {
+                    withCredentials: true,
+                });
+                setUser(response.data.user); // Set the logged-in user
+            } catch (error) {
+                navigate('/error'); // Navigate to error page on failure
             }
-  
-          } else {
-            // Regular user logic: Fetch own conversation directly
-            if (!initialUserId) {
-              const response = await axios.get(`http://localhost:4000/user/66b068ce8e6eb1b9d3ab587d`, { headers, withCredentials: true });
-              setSelectedConversation(response.data); // Set self as the conversation if no userId is provided
-            } else {
-              // If an initialUserId exists for regular users, fetch the conversation directly
-              const response = await axios.get(`${apiUrl}/user/${initialUserId}`, { headers, withCredentials: true });
-              setSelectedConversation(response.data);
+        };
+
+        const fetchList = async () => {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+
+                // Admins can fetch the full list of users
+                if (user?.role === 'admin') {
+                    const response = await axios.get(`${apiUrl}/users`, { headers, withCredentials: true });
+                    const filteredList = response.data.filter(item => item._id !== user._id); // Exclude self from the list
+                    setList(filteredList);
+
+                    // If an initialUserId exists, find and set the conversation
+                    if (initialUserId) {
+                        const conversation = filteredList.find(item => item._id === initialUserId);
+                        if (conversation) {
+                            setSelectedConversation(conversation); // Set the selected conversation
+                        }
+                    }
+                } else {
+                    // Regular user logic: Fetch conversation based on initialUserId or hardcoded user ID
+                    if (!initialUserId) {
+                        // Fetch hardcoded user ID for normal user if no initialUserId is provided
+                        const hardcodedUserId = '66b068ce8e6eb1b9d3ab587d'; // Replace with actual hardcoded ID
+                        const response = await axios.get(`${apiUrl}/user/${hardcodedUserId}`, { headers, withCredentials: true });
+                        setSelectedConversation(response.data); // Set self as the conversation
+                    } else {
+                        // If an initialUserId exists for regular users, fetch the conversation directly
+                        const response = await axios.get(`${apiUrl}/user/${initialUserId}`, { headers, withCredentials: true });
+                        setSelectedConversation(response.data);
+                    }
+                }
+            } catch (error) {
+                console.error(error); // Log any errors
             }
-          }
-  
-        } catch (error) {
-          console.error(error);
-        }
-      };
-  
-      fetchUser();
-      fetchList();
-    }, [user?.role, initialUserId, apiUrl, navigate]);
+        };
+
+        fetchUser(); // Fetch the user data
+        fetchList(); // Fetch the list of users and set the conversation
+    }, [user?.role, initialUserId, apiUrl, navigate]); // Dependencies for useEffect
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
