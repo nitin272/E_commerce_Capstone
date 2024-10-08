@@ -64,7 +64,7 @@ const Navbar = forwardRef(() => {
       <div className='flex items-center cursor-pointer'>
         <img src={logo} alt="logo" className='h-16 object-cover mr-4' />
         <Typography variant="h4" component="h1" sx={{ fontFamily: 'serif', fontWeight: 'bold', color: '#001F2B' }}>
-          Ecommerce
+          Balaji-Electronic
         </Typography>
       </div>
       <div className='flex items-center'>
