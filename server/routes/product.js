@@ -13,10 +13,10 @@ router.get('/',authMiddleware, productController.getAllProducts);
 router.get('/:productId',authMiddleware, productController.getProductById);
 
 
-router.post('/insert',authMiddleware,isAdmin, upload.array('images', 5), productController.createProduct);
+router.post('/insert',authMiddleware,isAdmin, upload.array('images', 10), productController.createProduct);
 
 
-router.put('/update/:productId',authMiddleware,isAdmin, upload.array('images', 5), productController.updateProduct);
+router.put('/update/:productId',authMiddleware,isAdmin, upload.array('images', 10), productController.updateProduct);
 
 
 router.delete('/:productId/images',authMiddleware,isAdmin, productController.deleteProductImage);
