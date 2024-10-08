@@ -15,7 +15,7 @@ app.use(cookieParser());
 
 
 const allowedOrigins = [
-  'http://localhost:4500', "http://localhost:4000" ,"https://e-commerce-capstone.onrender.com","https://balaji-electronic100.vercel.app",
+  'http://localhost:4500', "http://localhost:4000" ,"https://e-commerce-capstone.onrender.com","https://balaji-electronic100.vercel.app","http://e-commerce-capstone.onrender.com",
   // other allowed origins can be added here
 ];
 const corsOptions = {
