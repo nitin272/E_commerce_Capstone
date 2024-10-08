@@ -52,7 +52,8 @@ class User {
             res.cookie('jwt', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                maxAge: 3600000
+                maxAge: 3600000,
+                sameSite : "None"
             });
     
             res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, username: user.username, role: user.role } });
