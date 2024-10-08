@@ -69,7 +69,7 @@ auth.get('/auth/google/callback',
                 httpOnly: true, // Prevents access via JavaScript
                 secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
                 maxAge: 3600000,
-                sameSite: 'None"
+                sameSite: "None"
             });
 
             // Redirect to frontend (the cookie will be sent automatically)
