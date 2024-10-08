@@ -68,7 +68,8 @@ auth.get('/auth/google/callback',
             res.cookie('jwt', token, {
                 httpOnly: true, // Prevents access via JavaScript
                 secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                maxAge: 3600000 // 1 hour
+                maxAge: 3600000 // 1 hour,
+                sameSite : 'None"
             });
 
             // Redirect to frontend (the cookie will be sent automatically)
