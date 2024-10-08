@@ -73,7 +73,7 @@ auth.get('/auth/google/callback',
             });
 
             // Redirect to frontend (the cookie will be sent automatically)
-            res.redirect('http://localhost:4500');
+            res.redirect('https://balaji-electronic100.vercel.app');
         } catch (error) {
             console.error(error);
             res.status(500).send('Server Error');
