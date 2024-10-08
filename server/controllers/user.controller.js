@@ -203,28 +203,38 @@ static PostUser = async (req, res) => {
     }
 
 
-    static Logout = (req, res) => {
-        try {
-            // Clear the JWT cookie
-            res.clearCookie('jwt', { path: '/' }); 
-
-            if (req.session) {
-                req.session.destroy(err => {
-                    if (err) {
-                        return res.status(500).json({ message: 'Error while logging out. Please try again.', error: err });
-                    }
-                    console.log('User logged out successfully');
-                    return res.status(200).json({ message: 'Logged out successfully' });
+   static Logout = (req, res) => {
+    try {
+        // Clear all cookies, including JWT
+        if (req.cookies) {
+            Object.keys(req.cookies).forEach(cookie => {
+                res.clearCookie(cookie, { 
+                    path: '/', 
+                    sameSite: 'None',  // Set SameSite to None
+                    secure: true        // Ensure secure attribute is true if using HTTPS
                 });
-            } else {
-                console.log('User logged out successfully (no session)');
-                return res.status(200).json({ message: 'Logged out successfully' });
-            }
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ message: 'Server error during logout', error });
+            });
         }
-    };
+
+        // Destroy the session if it exists
+        if (req.session) {
+            req.session.destroy(err => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error while logging out. Please try again.', error: err });
+                }
+                console.log('User logged out successfully');
+                return res.status(200).json({ message: 'Logged out successfully' });
+            });
+        } else {
+            console.log('User logged out successfully (no session)');
+            return res.status(200).json({ message: 'Logged out successfully' });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Server error during logout', error });
+    }
+};
+
     
     
     
