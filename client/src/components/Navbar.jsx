@@ -48,6 +48,7 @@ const Navbar = forwardRef(() => {
       setUserData({});
       setIsAdmin(false);
       navigate('/');
+      localStorage.clear();
     }
   };
 
