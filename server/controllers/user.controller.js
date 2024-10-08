@@ -29,72 +29,81 @@ class User {
         }
     }
 
-    // Register new user
+
+
+    // Login user
+
     static Login = async (req, res) => {
         try {
             const { username, password } = req.body;
+    
             const user = await userModel.findOne({ username });
-            if (!user || !(await bcrypt.compare(password, user.password))) {
+            if (!user) {
                 return res.status(401).send('Invalid username or password');
             }
-
-            // Generate JWT token
+    
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (!passwordMatch) {
+                return res.status(401).send('Invalid username or password');
+            }
+    
             const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-            // Set the JWT as an HTTP-only cookie
+    
             res.cookie('jwt', token, {
-                httpOnly: true, // Prevents access via JavaScript
-                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                maxAge: 3600000 // 1 hour
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600000
+            });
+    
+            res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, username: user.username, role: user.role } });
+        } catch (error) {
+            res.status(500).send('Server Error');
+        }
+    }
+    
+
+
+
+  
+   // Register new user
+static PostUser = async (req, res) => {
+    try {
+        const { name, username, password, otp, validOtp } = req.body;
+
+        if (!(name && username && password && otp)) {
+            return res.status(400).send('All input required');
+        }
+
+        if (validOtp === otp) {
+            const existUser = await userModel.findOne({ username });
+            if (existUser) {
+                return res.status(400).send("User Already Exist. Please Login");
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = await userModel.create({
+                name,
+                username,
+                password: hashedPassword
             });
 
-            res.json({ message: 'Login successful' });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Server Error');
+            const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            res.cookie('jwt', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600000
+            });
+
+            res.status(201).json({ message: 'User registered successfully', user: newUser });
+        } else {
+            res.status(400).send("Invalid OTP");
         }
+    } catch (error) {
+        res.status(500).send('Server Error');
     }
+}
 
-    // Register new user
-    static PostUser = async (req, res) => {
-        try {
-            const { name, username, password, otp, validOtp } = req.body;
-
-            if (!(name && username && password && otp)) {
-                return res.status(400).send('All input required');
-            }
-            if (validOtp === otp) {
-                const existUser = await userModel.findOne({ username });
-                if (existUser) {
-                    return res.status(400).send("User Already Exist. Please Login");
-                } else {
-                    const hashedPassword = await bcrypt.hash(password, 10);
-                    const newUser = await userModel.create({
-                        name,
-                        username,
-                        password: hashedPassword
-                    });
-
-                    // Generate JWT token for new user
-                    const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-                    // Set the JWT as an HTTP-only cookie
-                    res.cookie('jwt', token, {
-                        httpOnly: true, // Prevents access via JavaScript
-                        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                        maxAge: 3600000 // 1 hour
-                    });
-
-                    res.json(newUser);
-                }
-            } else {
-                res.status(400).send("Invalid OTP");
-            }
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Server Error');
-        }
-    }
     // Get all admins
     static GetAdmins = async (req, res) => {
         try {
@@ -192,21 +201,6 @@ class User {
         res.json({ validOTP: Otp });
     }
 
-    // Login
-    // static Login = async (req, res) => {
-    //     try {
-    //         const { username, password } = req.body;
-    //         const user = await userModel.findOne({ username });
-    //         if (!user || !(await bcrypt.compare(password, user.password))) {
-    //             return res.status(401).send('Invalid username or password');
-    //         }
-    //         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    //         res.json({ token });
-    //     } catch (error) {
-    //         console.log(error);
-    //         res.status(500).send('Server Error');
-    //     }
-    // }
 
     static Logout = (req, res) => {
         try {
