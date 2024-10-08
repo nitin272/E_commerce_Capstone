@@ -13,7 +13,7 @@ const ProductDetail = () => {
     const [isEnquiring, setIsEnquiring] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useEffect(() => {
         const fetchProduct = async () => {

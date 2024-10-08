@@ -11,7 +11,7 @@ import Products from './ProductList';
 
 const AdminPanel = () => {
     const [selectedSection, setSelectedSection] = useState('users'); // State for selected section
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     const handleEditProduct = async (productId, updatedData) => {
         try {

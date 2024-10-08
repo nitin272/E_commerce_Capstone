@@ -22,7 +22,7 @@ const ChatList = () => {
     const { messages } = getMessages(user);
     const lastMessageRef = useRef();
     const { onlineUser } = useSocketContext();
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useListenMessage();
 

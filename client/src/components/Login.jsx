@@ -12,7 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
   // Handle login button click
   const onLoginBtn = async (e) => {

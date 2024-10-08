@@ -7,7 +7,7 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null); // State for current user
   const [loading, setLoading] = useState(true);
-  const apiUrl = import.meta.env.VITE_APP_API_URL; // Ensure this URL is correct
+  const apiUrl = "https://e-commerce-capstone.onrender.com"; // Ensure this URL is correct
   const navigate = useNavigate();
 
   // Function to fetch current user

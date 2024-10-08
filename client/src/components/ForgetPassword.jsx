@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
   const onSendbtn = async (e) => {
     e.preventDefault();
