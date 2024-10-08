@@ -23,7 +23,8 @@ export const SocketContextProvider = ({ children }) => {
         headers: {
           'Authorization': `Bearer ${id}`,
         }
-      })
+
+      },)
       setUser(response.data.user)
     } catch (error) {
       console.log(error);

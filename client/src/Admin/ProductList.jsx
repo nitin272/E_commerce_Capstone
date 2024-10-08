@@ -45,7 +45,9 @@ const Products = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${apiUrl}/products`);
+            const response = await axios.get(`${apiUrl}/products`, {
+                withCredentials: true // Include credentials in the request
+            });
             setProducts(response.data);
 
             const uniqueCategories = [...new Set(response.data.map(product => product.category))];
@@ -65,7 +67,10 @@ const Products = () => {
         setLoading(true);
         try {
             await axios.put(`${apiUrl}/products/update/${productId}`, updatedData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': 'multipart/form-data' 
+                },
+                withCredentials: true
+
             });
             toast.success('Product updated successfully.');
             fetchProducts();
@@ -82,7 +87,8 @@ const Products = () => {
         setLoading(true);
         try {
             await axios.post(`${apiUrl}/products/insert`, newData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true
             });
             toast.success('Product added successfully.');
             fetchProducts();
@@ -97,7 +103,10 @@ const Products = () => {
     const handleDeleteProduct = async (productId) => {
         setLoading(true);
         try {
-            await axios.delete(`${apiUrl}/products/${productId}`);
+            // Corrected URL with a leading slash before the productId
+            await axios.delete(`${apiUrl}/products/${productId}`, {
+                withCredentials: true // Include credentials in the request
+            });
             toast.success('Product deleted successfully.');
             fetchProducts();
         } catch (error) {
@@ -106,6 +115,7 @@ const Products = () => {
             setLoading(false);
         }
     };
+    
 
     const handleDeleteImage = async (imageUrl, index) => {
         if (!currentProduct?._id) return;
@@ -113,7 +123,8 @@ const Products = () => {
         setLoading(true);
         try {
             await axios.delete(`${apiUrl}/products/${currentProduct._id}/images`, {
-                data: { imageUrls: [imageUrl] }
+                data: { imageUrls: [imageUrl] },
+                withCredentials: true
             });
 
             setImagePreviews(prev => prev.filter((_, i) => i !== index));
@@ -210,237 +221,237 @@ const Products = () => {
 
     return (
         <>
-        <Container>
-            <SearchFilter
-                categories={categories}
-                onSearchChange={(value) => setSearchTerm(value)}
-                onCategoryChange={(option) => setSelectedCategory(option)}
-            />
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => openFormDialog()}
-                sx={{ mb: 15 }}
-            >
-                Add Product
-            </Button>
-
-            {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                    <CircularProgress />
-                </Box>
-            ) : (
-                <Grid
-                container
-                spacing={3}
-                sx={{
-                  mb: 4,
-                  justifyContent: 'center', // Center the grid items horizontally
-                  alignItems: 'flex-start', // Align items to the start vertically
-                }}
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
-                    <div
-                      key={product._id}
-                      className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-lg transition-transform transform hover:scale-105"
-                    >
-                      <img
-                        src={product.productImgUrls[0] || 'default-image-url'}
-                        alt={product.productName}
-                        className="h-48 w-full object-cover rounded-t-lg"
-                      />
-                      <div className="flex-grow p-4">
-                        <h2 className="text-lg font-semibold text-indigo-800 mb-2">
-                          {product.productName}
-                        </h2>
-                        <p className="text-gray-700 mb-2">
-                          <strong className="text-gray-900">Category:</strong> {product.category}
-                        </p>
-                        <p className="text-gray-700 mb-2">
-                          <strong className="text-gray-900">Price:</strong> ₹{product.price.toFixed(2)}
-                        </p>
-                        <p className="text-gray-700 mb-2">
-                          <strong className="text-gray-900">Stock:</strong> {product.stock}
-                        </p>
-                        <p className="text-gray-700 mb-4">
-                          <strong className="text-gray-900">Description:</strong> {product.description}
-                        </p>
-                      </div>
-                    
-                      <Box
-                      sx={{
-                        p: 2,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        borderRadius: 2, // Optional: Add rounded corners
-                        }}>
-                    <Button
+            <Container>
+                <SearchFilter
+                    categories={categories}
+                    onSearchChange={(value) => setSearchTerm(value)}
+                    onCategoryChange={(option) => setSelectedCategory(option)}
+                />
+                <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => openFormDialog(product)}
-                    sx={{ mr: 1, flexGrow: 1 }}>
-                        Edit
-                    </Button>
-                    <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDeleteProduct(product._id)}
-                    sx={{ flexGrow: 1 }}>
-                        Delete
-                    </Button>
-                </Box>
+                    onClick={() => openFormDialog()}
+                    sx={{ mb: 15 }}
+                >
+                    Add Product
+                </Button>
 
-
-                
-                    </div>
-                  ))}
-                </div>
-              </Grid>
-              
-              
-            )}
-            {/* Form Dialog */}
-            <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>
-                    {editMode ? 'Edit Product' : 'Add New Product'}
-                    <IconButton
-                        aria-label="close"
-                        onClick={() => setOpen(false)}
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Grid
+                        container
+                        spacing={3}
                         sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8,
-                            color: (theme) => theme.palette.grey[500],
+                            mb: 4,
+                            justifyContent: 'center', // Center the grid items horizontally
+                            alignItems: 'flex-start', // Align items to the start vertically
                         }}
                     >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <form onSubmit={handleSubmit}>
-                    <DialogContent>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            label="Product Name"
-                            name="productName"
-                            value={productData.productName}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Description"
-                            name="description"
-                            value={productData.description}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Price"
-                            name="price"
-                            type="number"
-                            value={productData.price}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Category"
-                            name="category"
-                            value={productData.category}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Stock"
-                            name="stock"
-                            type="number"
-                            value={productData.stock}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <Button
-                            variant="outlined"
-                            component="label"
-                            sx={{ mt: 2, mb: 2 }}
-                        >
-                            Upload Images
-                            <input
-                                type="file"
-                                hidden
-                                multiple
-                                accept="image/*"
-                                onChange={handleFileChange}
-                            />
-                        </Button>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                            {imagePreviews.map((preview, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        position: 'relative',
-                                        m: 1,
-                                        height: 150,
-                                        width: 200,
-                                        borderRadius: 2,
-                                        overflow: 'hidden',
-                                    }}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {filteredProducts.map((product) => (
+                                <div
+                                    key={product._id}
+                                    className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-lg transition-transform transform hover:scale-105"
                                 >
                                     <img
-                                        src={preview}
-                                        alt="preview"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        src={product.productImgUrls[0] || 'default-image-url'}
+                                        alt={product.productName}
+                                        className="h-48 w-full object-cover rounded-t-lg"
                                     />
-                            <IconButton
-                            onClick={() => handleRemoveImage(index)}
-  
-                            sx={{
-    
-                                width: 40, // Increased width
-    
-                                height: 40, // Increased height for better touch target
-    
-                                position: 'absolute',
-    
-                                top: -5,
-    
-                                right: -5,
-    
-                                borderRadius: '50%', // Make it circular
-    
-                                '&:hover': {
-      
-                                    backgroundColor: 'Black', // Darker background on hover
-    
-                                },
-  
-  }}
-><CloseIcon sx={{ fontSize: 34, fontWeight: 'bold', color: 'red' }} /> {/* Increased icon size and made it bold */}
-</IconButton>
+                                    <div className="flex-grow p-4">
+                                        <h2 className="text-lg font-semibold text-indigo-800 mb-2">
+                                            {product.productName}
+                                        </h2>
+                                        <p className="text-gray-700 mb-2">
+                                            <strong className="text-gray-900">Category:</strong> {product.category}
+                                        </p>
+                                        <p className="text-gray-700 mb-2">
+                                            <strong className="text-gray-900">Price:</strong> ₹{product.price.toFixed(2)}
+                                        </p>
+                                        <p className="text-gray-700 mb-2">
+                                            <strong className="text-gray-900">Stock:</strong> {product.stock}
+                                        </p>
+                                        <p className="text-gray-700 mb-4">
+                                            <strong className="text-gray-900">Description:</strong> {product.description}
+                                        </p>
+                                    </div>
 
-                                </Box>
+                                    <Box
+                                        sx={{
+                                            p: 2,
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            borderRadius: 2, // Optional: Add rounded corners
+                                        }}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => openFormDialog(product)}
+                                            sx={{ mr: 1, flexGrow: 1 }}>
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeleteProduct(product._id)}
+                                            sx={{ flexGrow: 1 }}>
+                                            Delete
+                                        </Button>
+                                    </Box>
+
+
+
+                                </div>
                             ))}
-                        </Box>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpen(false)}>Cancel</Button>
-                        <Button type="submit" color="primary" variant="contained">
-                            {editMode ? 'Update' : 'Add'}
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+                        </div>
+                    </Grid>
 
-            <ToastContainer />
-        </Container>
+
+                )}
+                {/* Form Dialog */}
+                <Dialog open={open} onClose={() => setOpen(false)}>
+                    <DialogTitle>
+                        {editMode ? 'Edit Product' : 'Add New Product'}
+                        <IconButton
+                            aria-label="close"
+                            onClick={() => setOpen(false)}
+                            sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: 8,
+                                color: (theme) => theme.palette.grey[500],
+                            }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+                    <form onSubmit={handleSubmit}>
+                        <DialogContent>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                label="Product Name"
+                                name="productName"
+                                value={productData.productName}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <TextField
+                                margin="dense"
+                                label="Description"
+                                name="description"
+                                value={productData.description}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <TextField
+                                margin="dense"
+                                label="Price"
+                                name="price"
+                                type="number"
+                                value={productData.price}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <TextField
+                                margin="dense"
+                                label="Category"
+                                name="category"
+                                value={productData.category}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <TextField
+                                margin="dense"
+                                label="Stock"
+                                name="stock"
+                                type="number"
+                                value={productData.stock}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <Button
+                                variant="outlined"
+                                component="label"
+                                sx={{ mt: 2, mb: 2 }}
+                            >
+                                Upload Images
+                                <input
+                                    type="file"
+                                    hidden
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                                {imagePreviews.map((preview, index) => (
+                                    <Box
+                                        key={index}
+                                        sx={{
+                                            position: 'relative',
+                                            m: 1,
+                                            height: 150,
+                                            width: 200,
+                                            borderRadius: 2,
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <img
+                                            src={preview}
+                                            alt="preview"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                        <IconButton
+                                            onClick={() => handleRemoveImage(index)}
+
+                                            sx={{
+
+                                                width: 40, // Increased width
+
+                                                height: 40, // Increased height for better touch target
+
+                                                position: 'absolute',
+
+                                                top: -5,
+
+                                                right: -5,
+
+                                                borderRadius: '50%', // Make it circular
+
+                                                '&:hover': {
+
+                                                    backgroundColor: 'Black', // Darker background on hover
+
+                                                },
+
+                                            }}
+                                        ><CloseIcon sx={{ fontSize: 34, fontWeight: 'bold', color: 'red' }} /> {/* Increased icon size and made it bold */}
+                                        </IconButton>
+
+                                    </Box>
+                                ))}
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setOpen(false)}>Cancel</Button>
+                            <Button type="submit" color="primary" variant="contained">
+                                {editMode ? 'Update' : 'Add'}
+                            </Button>
+                        </DialogActions>
+                    </form>
+                </Dialog>
+
+                <ToastContainer />
+            </Container>
         </>
     );
 };

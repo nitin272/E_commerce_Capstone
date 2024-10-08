@@ -3,23 +3,24 @@ const router = express.Router();
 const productController = require('../controllers/product.controller'); // Adjust the path if needed
 const upload = require('../middleware/Files.middleware'); // Adjust the path if needed
 const { User } = require('../controllers/user.controller');
+const { authMiddleware } = require('../middleware/TokenVerify.middleware');
+const isAdmin = require('../middleware/IsAdmin.middleware');
 
 
 
+router.get('/',authMiddleware, productController.getAllProducts);
 
-router.get('/', productController.getAllProducts);
-
-router.get('/:productId', productController.getProductById);
-
-
-router.post('/insert', upload.array('images', 5), productController.createProduct);
+router.get('/:productId',authMiddleware, productController.getProductById);
 
 
-router.put('/update/:productId', upload.array('images', 5), productController.updateProduct);
+router.post('/insert',authMiddleware,isAdmin, upload.array('images', 5), productController.createProduct);
 
 
-router.delete('/:productId/images', productController.deleteProductImage);
+router.put('/update/:productId',authMiddleware,isAdmin, upload.array('images', 5), productController.updateProduct);
 
-router.delete('/:productId',  productController.deleteProduct);
+
+router.delete('/:productId/images',authMiddleware,isAdmin, productController.deleteProductImage);
+
+router.delete('/:productId',authMiddleware,isAdmin, productController.deleteProduct);
 
 module.exports = router;

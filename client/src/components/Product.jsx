@@ -24,7 +24,8 @@ const Product = () => {
                 const productsResponse = await axios.get(`${apiUrl}/products/`, {
                     headers: {
                         'Authorization': `Bearer ${id}`
-                    }
+                    },
+                    withCredentials: true
                 });
                 setProducts(productsResponse.data);
 
@@ -57,7 +58,8 @@ const Product = () => {
         setIsEnquiring(true);
         try {
             const { productName, category, description, productImgUrls, _id } = product;
-            const productUrl = `${window.location.origin}/products/${_id}`; // Construct the product detail URL
+            const productUrl = `${window.location.origin}/products/${_id}`; 
+
             const imageUrl = productImgUrls[0]; // First image URL
     
             // Improved WhatsApp message
