@@ -19,6 +19,8 @@ passport.use(new OAuth2Strategy({
     callbackURL: "/auth/google/callback",
     scope: ["profile", "email"]
 }, async (accessToken, refreshToken, profile, done) => {
+    console.log("OAuth2 Response: ", profile); // Log profile to see what data is being returned
+  
     try {
         // Check if the user already exists
         let user = await userModel.findOne({ username: profile.emails[0].value });
@@ -73,7 +75,7 @@ auth.get('/auth/google/callback',
             });
 
             // Redirect to frontend (the cookie will be sent automatically)
-            res.redirect('http://localhost:4500');
+            res.redirect('https://balaji-electronic100.vercel.app');
         } catch (error) {
             console.error(error);
             res.status(500).send('Server Error');

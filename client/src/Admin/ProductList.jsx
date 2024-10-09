@@ -40,7 +40,7 @@ const Products = () => {
     const [currentProduct, setCurrentProduct] = useState(null);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
-    const apiUrl = "https://e-commerce-capstone.onrender.com";
+    const apiUrl = import.meta.env.VITE_APP_API_URL;
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -241,75 +241,54 @@ const Products = () => {
                         <CircularProgress />
                     </Box>
                 ) : (
-                    <Grid
-                        container
-                        spacing={3}
-                        sx={{
-                            mb: 4,
-                            justifyContent: 'center', // Center the grid items horizontally
-                            alignItems: 'flex-start', // Align items to the start vertically
-                        }}
-                    >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {filteredProducts.map((product) => (
-                                <div
-                                    key={product._id}
-                                    className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-lg transition-transform transform hover:scale-105"
-                                >
-                                    <img
-                                        src={product.productImgUrls[0] || 'default-image-url'}
+                    <Grid container spacing={3} justifyContent="center">
+                        {filteredProducts.map((product) => (
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
+                                <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2, boxShadow: 3 }}>
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={product.productImgUrls[0] || 'default-image-url'}
                                         alt={product.productName}
-                                        className="h-48 w-full object-cover rounded-t-lg"
+                                        sx={{ objectFit: 'cover', borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
                                     />
-                                    <div className="flex-grow p-4">
-                                        <h2 className="text-lg font-semibold text-indigo-800 mb-2">
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        <Typography variant="h6" component="h2" color="primary">
                                             {product.productName}
-                                        </h2>
-                                        <p className="text-gray-700 mb-2">
-                                            <strong className="text-gray-900">Category:</strong> {product.category}
-                                        </p>
-                                        <p className="text-gray-700 mb-2">
-                                            <strong className="text-gray-900">Price:</strong> ₹{product.price.toFixed(2)}
-                                        </p>
-                                        <p className="text-gray-700 mb-2">
-                                            <strong className="text-gray-900">Stock:</strong> {product.stock}
-                                        </p>
-                                        <p className="text-gray-700 mb-4">
-                                            <strong className="text-gray-900">Description:</strong> {product.description}
-                                        </p>
-                                    </div>
-
-                                    <Box
-                                        sx={{
-                                            p: 2,
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            borderRadius: 2, // Optional: Add rounded corners
-                                        }}>
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            <strong>Category:</strong> {product.category}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            <strong>Price:</strong> ₹{product.price.toFixed(2)}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            <strong>Stock:</strong> {product.stock}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            <strong>Description:</strong> {product.description}
+                                        </Typography>
+                                    </CardContent>
+                                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e0e0e0' }}>
                                         <Button
                                             variant="contained"
                                             color="primary"
                                             onClick={() => openFormDialog(product)}
-                                            sx={{ mr: 1, flexGrow: 1 }}>
+                                        >
                                             Edit
                                         </Button>
                                         <Button
                                             variant="contained"
                                             color="error"
                                             onClick={() => handleDeleteProduct(product._id)}
-                                            sx={{ flexGrow: 1 }}>
+                                        >
                                             Delete
                                         </Button>
                                     </Box>
-
-
-
-                                </div>
-                            ))}
-                        </div>
+                                </Card>
+                            </Grid>
+                        ))}
                     </Grid>
-
-
                 )}
                 {/* Form Dialog */}
                 <Dialog open={open} onClose={() => setOpen(false)}>

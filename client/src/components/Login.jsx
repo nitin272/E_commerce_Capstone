@@ -12,7 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const apiUrl = "https://e-commerce-capstone.onrender.com";
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
 
   // Handle login button click
   const onLoginBtn = async (e) => {
@@ -63,7 +63,7 @@ const Login = () => {
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
       <div className="flex flex-col items-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-8 bg-white rounded-lg shadow-lg">
         <img src={logo} alt="Logo" className="mx-auto h-24 mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Balaji Electronics</h1>
+        <h1 className="text-2xl font-bold mb-4">Scale Mart</h1>
 
         <h2 className="text-3xl font-light mb-4 text-center">Login</h2>
 

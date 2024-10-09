@@ -22,7 +22,7 @@ const ChatList = () => {
     const { messages } = getMessages(user);
     const lastMessageRef = useRef();
     const { onlineUser } = useSocketContext();
-    const apiUrl = "https://e-commerce-capstone.onrender.com";
+    const apiUrl = import.meta.env.VITE_APP_API_URL;
 
     useListenMessage();
 
@@ -99,54 +99,81 @@ const ChatList = () => {
     };
 
     const renderChatHeader = () => (
-        <header className='flex items-center p-5 bg-gray-100 shadow-md border-b border-gray-300'
-        style={{marginTop:"12vh"}}>
+        <header className="flex items-center justify-between p-3 md:p-5 bg-white shadow-md border-b border-gray-200"
+            style={{ marginTop: "12vh" }}>
+            
+            {/* Sidebar Toggle for Admins */}
             {user.role === 'admin' && (
                 <IconButton
-                style={{fontSize:"50px"}}
                     onClick={() => setIsSidebarOpen(prev => !prev)}
-                    className='text-gray-600'
+                    className="text-gray-600 md:text-gray-700"
                 >
-                    <MenuIcon />
+                    <MenuIcon style={{ fontSize: "30px" }} /> {/* Reduced font size for better fit */}
                 </IconButton>
             )}
+    
+            {/* If conversation is selected */}
             {selectedConversation ? (
-                <>
+                <div className="flex items-center flex-grow">
+                    {/* User Avatar */}
                     {selectedConversation.ownerImg?.[0] ? (
-                        <img src={selectedConversation.ownerImg[0]} alt="User" className='h-12 w-12 rounded-full object-cover border-2 border-gray-300' />
+                        <img 
+                            src={selectedConversation.ownerImg[0]} 
+                            alt="User" 
+                            className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                        />
                     ) : (
-                        <AccountCircle color='inherit' style={{ fontSize: "48px", color: 'gray' }} />
+                        <AccountCircle style={{ fontSize: "40px", color: 'gray' }} />
                     )}
-                    <div className='ml-4'>
-                        <h1 className='font-semibold text-lg text-gray-800'>{selectedConversation.name || 'Unknown'}</h1>
-                        <p className='text-sm text-gray-600'>{selectedConversation.username || 'No email available'}</p>
+                    
+                    {/* User Details */}
+                    <div className="ml-3 overflow-hidden">
+                        <h1 className="text-base md:text-lg font-semibold text-gray-800 truncate">{selectedConversation.name || 'Unknown'}</h1>
+                        {/* <p className="text-xs md:text-sm text-gray-600 truncate">{selectedConversation.username || 'No email available'}</p> */}
                     </div>
-                </>
+                </div>
             ) : (
-                <div className='ml-4'>
-                    <h1 className='font-semibold text-lg text-gray-800'>No Conversation Selected</h1>
+                <div className="flex-grow ml-4">
+                    <h1 className="text-lg font-semibold text-gray-800">No Conversation Selected</h1>
                 </div>
             )}
         </header>
     );
+    
 
     const renderMessages = () => {
         if (!selectedConversation) return null;
-
+    
         return (
-            <div className='flex-1 p-4 overflow-auto bg-gray-50'>
+            <div className="flex-1 p-4 overflow-auto"
+                style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/white-wall.png")', backgroundColor: '#f4f7fc' }}>
+                
                 {messages.length === 0 ? (
-                    <div className='flex items-center justify-center h-full'>
-                        <p className='text-md text-gray-500'>Start a conversation with {selectedConversation.name}</p>
+                    <div className="flex items-center justify-center h-full">
+                        <p className="text-lg md:text-xl text-gray-600 text-center">
+                            Start a conversation with {selectedConversation.name}
+                        </p>
                     </div>
                 ) : (
-                    <div>
+                    <div className="space-y-4">
                         {messages.map((message, index) => (
-                            <div key={index} ref={lastMessageRef} className={`mb-2 ${message.senderId === user._id ? 'text-right' : 'text-left'}`}>
-                                <div className={`inline-block p-3 rounded-lg ${message.senderId === user._id ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border border-gray-300'}`}>
-                                    {message.message}
+                            <div 
+                                key={index} 
+                                ref={lastMessageRef} 
+                                className={`flex flex-col ${message.senderId === user._id ? 'items-end' : 'items-start'}`}
+                            >
+                                <div className={`relative p-4 rounded-2xl max-w-[75%] md:max-w-[60%] shadow-md 
+                                    ${message.senderId === user._id ? 
+                                    'bg-gradient-to-r from-green-400 to-green-500 text-white' : 
+                                    'bg-white border border-gray-200 text-gray-800'}`}
+                                >
+                                    <p className="text-base md:text-lg break-words">
+                                        {message.message}
+                                    </p>
                                 </div>
-                                <p className={`text-xs ${message.senderId === user._id ? 'text-right' : 'text-left'} text-gray-500`}>
+    
+                                {/* Aligned timestamp below the message */}
+                                <p className={`text-xs md:text-sm text-gray-500 mt-1 ${message.senderId === user._id ? 'text-right' : 'text-left'}`}>
                                     {abstractTime(message.createdAt)}
                                 </p>
                             </div>
@@ -156,75 +183,114 @@ const ChatList = () => {
             </div>
         );
     };
+    
+    
+    
 
-    const renderMessageInput = () => (
-        <div className='p-4 bg-gray-200 border-t border-gray-300'> {/* Changed background color to a lighter shade */}
-            <form onSubmit={handleSubmit} className='flex items-center'>
-                <TextField
-                    type="text"
-                    size='small'
-                    value={newMessage}
-                    placeholder='Type a message'
-                    fullWidth
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    InputProps={{
-                        style: {
-                            borderRadius: '20px', 
-                            padding: '8px', 
-                            backgroundColor: '#fff', // Keeping the white background for the input
-                            border: '1px solid #ccc', // Light border for better visibility
-                        },
-                    }}
-                />
-                <Button
-                    type='submit'
-                    variant='contained'
-                    color='primary'
-                    style={{
-                        marginLeft: '8px',
-                        borderRadius: '20px',
-                        padding: '8px 16px',
-                        backgroundColor: '#00796b', // Using a teal color for the button to match the theme
-                        color: 'white', // Ensuring the text is white for contrast
-                        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', // Adding a subtle shadow for depth
-                    }}
-                >
-                    <SendIcon />
-                </Button>
-            </form>
-        </div>
-    );
+   const renderMessageInput = () => (
+    <div 
+        className='p-4 bg-gray-100 border-t border-gray-300 flex justify-center items-center' 
+        style={{
+            position: 'sticky', 
+            bottom: 0, 
+            zIndex: 10,
+            backgroundColor: '#f9fafb' // Light background color for a cleaner look
+        }}
+    >
+        <form 
+            onSubmit={handleSubmit} 
+            className='flex items-center w-full max-w-4xl' // Maximum width for larger screens
+        >
+            <TextField
+                type="text"
+                size='small'
+                value={newMessage}
+                placeholder='Type a message...'
+                fullWidth
+                onChange={(e) => setNewMessage(e.target.value)}
+                InputProps={{
+                    style: {
+                        borderRadius: '25px', // More rounded corners for modern look
+                        padding: '10px 14px',
+                        backgroundColor: '#fff', // Keeping input background white
+                        border: '1px solid #ddd', // Subtle border for input
+                        fontSize: '16px', // Base font size
+                    },
+                }}
+                style={{
+                    flexGrow: 1, 
+                    marginRight: '10px' // Space between input and button
+                }}
+            />
+            <Button
+                type='submit'
+                variant='contained'
+                color='primary'
+                style={{
+                    borderRadius: '50%', // Circular button for a sleek design
+                    padding: '10px',
+                    minWidth: '50px',
+                    height: '50px',
+                    backgroundColor: '#00796b', // Consistent teal color
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    boxShadow: '0 3px 6px rgba(0, 0, 0, 0.1)', // Soft shadow for elevation
+                    transition: 'background-color 0.3s ease', // Smooth hover effect
+                    zIndex: 10,
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005f56'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00796b'}
+            >
+                <SendIcon style={{ fontSize: '24px' }} />
+            </Button>
+        </form>
+    </div>
+);
+
     
     const renderSidebar = () => (
         <div
-            className={`fixed top-0 left-0 h-full bg-gradient-to-b from-teal-400 to-teal-700 p-6 transition-transform duration-500 ease-in-out z-10 sidebar ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-            style={{ width: '320px', marginTop: "12vh", boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)" }} // Increased width to 400px
+            className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform duration-500 ease-in-out z-10 sidebar ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            style={{
+                width: isSidebarOpen ? '30vw' : '0',
+                marginTop: "12vh",
+                maxWidth: '400px',
+                minWidth: '250px',
+                zIndex: 50
+            }}
         >
-            <h1 className='text-white text-4xl font-bold mb-8 text-center drop-shadow-lg'>Chats</h1> {/* Increased font size */}
+            {/* <h1 className='text-gray-800 text-3xl font-bold mb-6 text-center drop-shadow-md'>Chats</h1> */}
             <div className='overflow-y-auto h-[calc(100vh-12vh)]'>
-                {list.map((item) => (
-                    <div
-                        key={item._id}
-                        onClick={() => {
-                            setSelectedConversation(item);
-                            setIsSidebarOpen(false);
-                        }}
-                        className={`flex items-center p-4 rounded-lg cursor-pointer mb-3 transition-all duration-200 ease-in-out hover:bg-teal-500 ${selectedConversation?._id === item._id ? 'bg-teal-500 shadow-md' : 'bg-teal-300'}`} // Shadow on selected item
-                    >
-                        {item.ownerImg[0] ? (
-                            <img src={item.ownerImg[0]} alt="User" className='h-14 w-14 rounded-full object-cover border-2 border-white shadow-lg' /> // Slightly larger image
-                        ) : (
-                            <AccountCircle color='inherit' style={{ fontSize: "56px", color: 'white' }} /> // Larger icon for better visibility
-                        )}
-                        <div className='ml-4 overflow-hidden'> {/* Added overflow-hidden to prevent overflow */}
-                            <h1 className='font-semibold text-lg text-gray-900'>{item.name}</h1> {/* Darker font for name */}
-                            <p className='text-sm text-gray-800 truncate'>{item.username}</p> {/* Added truncate for username */}
+                {list.length > 0 ? (
+                    list.map((item) => (
+                        <div
+                            key={item._id}
+                            onClick={() => {
+                                setSelectedConversation(item);
+                                setIsSidebarOpen(false);
+                            }}
+                            className={`flex items-center p-4 rounded-lg cursor-pointer mb-3 transition-all duration-200 ease-in-out hover:bg-gray-200 ${selectedConversation?._id === item._id ? 'bg-teal-500 text-white shadow-md' : 'bg-transparent text-gray-800'}`}
+                        >
+                            {item.ownerImg[0] ? (
+                                <img src={item.ownerImg[0]} alt="User" className='h-12 w-12 rounded-full object-cover border-2 border-teal-500 shadow-md' />
+                            ) : (
+                                <AccountCircle color='inherit' style={{ fontSize: "48px", color: 'gray' }} />
+                            )}
+                            <div className='ml-4 overflow-hidden'>
+                                <h1 className='font-semibold text-lg text-gray-900 truncate'>{item.name}</h1>
+                                <p className='text-sm text-gray-600 truncate'>{item.username}</p>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <p className="text-gray-500 text-center">No chats available</p>
+                )}
             </div>
         </div>
     );
+    
     
     
     
@@ -246,7 +312,7 @@ const ChatList = () => {
     }, [isSidebarOpen]);
 
     return (
-        <div className={`flex h-screen transition-all ${isSidebarOpen ? 'ml-80' : 'ml-0' } overflow-hidden `}>
+        <div className={`flex h-screen transition-all ${isSidebarOpen ? 'ml-78' : 'ml-0' } overflow-hidden `}>
             {user.role === 'admin' && renderSidebar()}
             <div className='flex flex-col flex-1'>
                 <Navbar />

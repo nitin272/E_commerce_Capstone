@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Typography, Box, Button, CircularProgress } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Avatar,
+  Typography,
+  Box,
+  Button,
+  CircularProgress,
+  TextField
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null); // State for current user
   const [loading, setLoading] = useState(true);
-  const apiUrl = "https://e-commerce-capstone.onrender.com"; // Ensure this URL is correct
+  const [searchTerm, setSearchTerm] = useState(''); // State for search term
+  const apiUrl = import.meta.env.VITE_APP_API_URL; // Ensure this URL is correct
   const navigate = useNavigate();
 
   // Function to fetch current user
@@ -58,9 +73,13 @@ const Users = () => {
   const currentUserId = currentUser?._id;
 
   // Filter out the current user from the users list
-  const filteredUsers = users.filter(user => {
-    return String(user._id) !== String(currentUserId);
-  });
+  const filteredUsers = users.filter(user => String(user._id) !== String(currentUserId));
+
+  // Further filter based on search term
+  const searchedUsers = filteredUsers.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleStartChat = (userId, username) => {
     // Pass both userId and username (email) to the chat component
@@ -68,10 +87,18 @@ const Users = () => {
   };
 
   return (
-    <Box padding={-5}>
+    <Box padding={3}>
       <Typography variant="h4" gutterBottom>
         Users
       </Typography>
+      <TextField
+        variant="outlined"
+        placeholder="Search users by name or email..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -84,7 +111,7 @@ const Users = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredUsers.map(user => (
+            {searchedUsers.map(user => (
               <TableRow key={user._id}>
                 <TableCell>
                   <Avatar

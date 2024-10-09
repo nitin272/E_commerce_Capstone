@@ -5,7 +5,7 @@ const getMessages = (user) => {
     const { messages, selectedConversation, setMessages, } = useConversation()
     // useListenMessage()
 
-    const apiUrl = "https://e-commerce-capstone.onrender.com"
+    const apiUrl = import.meta.env.VITE_APP_API_URL
     useEffect(() => {
         // console.log('selectedConversation._id',selectedConversation);
         // console.log('user._id',user._id);
