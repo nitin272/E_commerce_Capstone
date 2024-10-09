@@ -14,7 +14,7 @@ const Product = () => {
     const [alert, setAlert] = useState('');
     const [loading, setLoading] = useState(true);
     const [isEnquiring, setIsEnquiring] = useState(false); // Added state for enquiry feedback
-    const apiUrl = "https://e-commerce-capstone.onrender.com";
+    const apiUrl = import.meta.env.VITE_APP_API_URL;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -58,10 +58,10 @@ const Product = () => {
         setIsEnquiring(true);
         try {
             const { productName, category, description, productImgUrls, _id } = product;
-            const productUrl = `${window.location.origin}/products/${_id}`; 
+            const productUrl = `${window.location.origin}/products/${_id}`;
 
             const imageUrl = productImgUrls[0]; // First image URL
-    
+
             // Improved WhatsApp message
             const whatsappMessage = `Hello! 🌟\n\n` +
                 `I'm interested in learning more about the following product:\n\n` +
@@ -71,7 +71,7 @@ const Product = () => {
                 `*Product Link:* ${productUrl}\n` + // Product detail link
                 `*Image:* ${imageUrl}\n\n` +
                 `Could you please provide more details? Thank you! 🙏`;
-    
+
             const encodedMessage = encodeURIComponent(whatsappMessage);
             const whatsappUrl = `https://wa.me/${9413262126}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
@@ -81,7 +81,6 @@ const Product = () => {
             setIsEnquiring(false);
         }
     };
-    
 
     const handleSearchChange = (inputValue) => {
         setSearchTerm(inputValue);
@@ -106,7 +105,7 @@ const Product = () => {
             return { message: 'In stock', className: 'text-green-600' }; // Green color for available stock
         }
     };
-    
+
     const Carousel = ({ images = [] }) => {
         const [currentIndex, setCurrentIndex] = useState(0);
         const carouselRef = useRef(null);
@@ -136,57 +135,43 @@ const Product = () => {
         }
 
         return (
-            
             <div className="relative overflow-hidden rounded-lg shadow-lg bg-gray-200">
                 <div className="flex transition-transform duration-700 ease-in-out" ref={carouselRef}>
                     {images.map((img, index) => (
                         <div key={index} className="min-w-full">
                             <CardMedia
                                 component="img"
-                                height="250" // Adjust the height for larger images
+                                height="200" // Fixed height for uniformity
                                 image={img}
                                 alt={`Product Image ${index}`}
-                                sx={{ borderRadius: '8px', objectFit: 'cover' }}
+                                sx={{
+                                    borderRadius: '8px',
+                                    objectFit: 'cover', // Maintain aspect ratio
+                                    maxHeight: '200px', // Ensures all images are the same height
+                                    minHeight: '200px', // Ensures minimum height is maintained
+                                }}
                             />
                         </div>
                     ))}
                 </div>
                 <button
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-lg transition-opacity opacity-75 hover:opacity-100"
+                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-lg transition-opacity opacity-75 hover:opacity-100"
                     onClick={() => handleCarouselChange(-1)}
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
+                    &lt;
                 </button>
                 <button
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-lg transition-opacity opacity-75 hover:opacity-100"
+                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-lg transition-opacity opacity-75 hover:opacity-100"
                     onClick={() => handleCarouselChange(1)}
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+                    &gt;
                 </button>
             </div>
         );
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-50">
             <Navbar option="products" />
             <div className="container mx-auto py-8 px-4">
                 {alert && (
@@ -203,67 +188,63 @@ const Product = () => {
                 ) : (
                     <>
                         <SearchFilter
-
                             categories={categories}
                             onSearchChange={handleSearchChange}
                             onCategoryChange={handleCategoryChange}
                         />
 
-<div className="mt-8">
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center">
-        {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => {
-                const stockInfo = stockStatus(product.stock);
-                return (
-                    <Card key={product._id} sx={{ maxWidth: 360, boxShadow: 6, borderRadius: 4 , marginLeft:'3vh' }} className="bg-white hover:shadow-xl transition-shadow">
-                        <Carousel images={product.productImgUrls} />
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom className="truncate text-gray-800 font-semibold">
-                                {product.productName}
-                            </Typography>
-                            <div className="flex flex-col gap-2 mt-2">
-                                <Typography variant="body1" className="text-xl font-bold text-gray-700">
-                                    Category: <span className="font-normal text-gray-800">{product.category}</span>
+                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map(product => {
+                                    const stockInfo = stockStatus(product.stock);
+                                    return (
+                                        <Card key={product._id} className="bg-white shadow-md hover:shadow-lg transition-shadow rounded-lg overflow-hidden">
+                                            <Carousel images={product.productImgUrls} />
+                                            <CardContent>
+                                                <Typography variant="h6" className="text-gray-800 font-semibold truncate">
+                                                    {product.productName}
+                                                </Typography>
+                                                <div className="mt-2 space-y-2">
+                                                    <Typography variant="body1" className="text-gray-600">
+                                                        Category: {product.category}
+                                                    </Typography>
+                                                    <Typography variant="body1" className="text-gray-600">
+                                                        Price: ₹{product.price}
+                                                    </Typography>
+                                                    <Typography variant="body1" className={`font-semibold ${stockInfo.className}`}>
+                                                        {stockInfo.message}
+                                                    </Typography>
+                                                </div>
+                                                <div className="flex justify-between items-center mt-4">
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => handleMoreInfo(product._id)}
+                                                        sx={{
+                                                            padding: { xs: '8px 12px', sm: '10px 16px' },  // Smaller padding for extra-small screens
+                                                        }}
+                                                    >
+                                                        More Info
+                                                    </Button>
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        onClick={() => handleEnquiry(product)}
+                                                        disabled={isEnquiring}
+                                                    >
+                                                        {isEnquiring ? 'Enquiring...' : 'Enquire'}
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })
+                            ) : (
+                                <Typography variant="h6" className="text-gray-600 text-center col-span-full">
+                                    No products found.
                                 </Typography>
-                                <Typography variant="body1" className="text-xl font-bold text-gray-700">
-                                    Price: <span className="font-normal text-gray-800">₹{product.price}</span>
-                                </Typography>
-                                <Typography variant="body1" className={`text-xl font-bold ${stockInfo.className}`}>
-                                <span className="font-normal">{stockInfo.message}</span>
-                                </Typography>
-                                {/* <Typography variant="body2" className="text-gray-600">
-                                    {product.description.length > 100 ? `${product.description.slice(0, 100)}...` : product.description}
-                                </Typography> */}
-                            </div>
-                            <div className="flex justify-between mt-4">
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleMoreInfo(product._id)}
-                                >
-                                    More Info
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={() => handleEnquiry(product)}
-                                    disabled={isEnquiring}
-                                >
-                                    {isEnquiring ? <CircularProgress size={24} /> : 'Enquire'}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                );
-            })
-        ) : (
-            <Typography variant="body1" className="text-gray-600">
-                No products available.
-            </Typography>
-        )}
-    </div>
-</div>
-
+                            )}
+                        </div>
                     </>
                 )}
             </div>

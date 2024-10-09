@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const apiUrl = "https://e-commerce-capstone.onrender.com";
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

@@ -14,7 +14,7 @@ export const SocketContextProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const {selectedConversation,conversation_Id } = useConversation()
 
-  const apiUrl = "https://e-commerce-capstone.onrender.com"
+  const apiUrl = import.meta.env.VITE_APP_API_URL
   const fetchUser = async () => {
     try {
       const id = localStorage.getItem('id')

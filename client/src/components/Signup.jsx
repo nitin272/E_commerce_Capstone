@@ -22,7 +22,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = "https://e-commerce-capstone.onrender.com";
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -85,7 +85,7 @@ const Signup = () => {
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar newestOnTop closeOnClick rtl pauseOnFocusLoss draggable pauseOnHover />
       <div className="flex flex-col items-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-8 bg-white rounded-lg shadow-lg">
         <img src={logo} alt="Logo" className="mx-auto h-24 mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Balaji Electronics</h1>
+        <h1 className="text-2xl font-bold mb-4">Scale Mart</h1>
 
         {error &&
           <toast.error>{error}</toast.error>
