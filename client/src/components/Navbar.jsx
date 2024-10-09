@@ -64,9 +64,15 @@ const Navbar = forwardRef(() => {
     <div className='fixed top-0 left-0 right-0 flex justify-between items-center p-3 shadow-md w-full bg-white z-50'>
       {/* Logo and Title */}
       <div className='flex items-center cursor-pointer'>
+
         <img src={logo} alt="logo" className={`h-12 object-cover mr-2 ${isTablet ? 'h-10' : 'h-16'}`} />
         <Typography variant="h5" component="h4" className={`text-xl ${isTablet ? 'text-lg' : 'text-2xl'} font-bold`} sx={{ fontFamily: 'serif', color: '#001F2B' }}>
 Scale Mart
+
+        <img src={logo} alt="logo" className='h-16 object-cover mr-4' />
+        <Typography variant="h4" component="h1" sx={{ fontFamily: 'serif', fontWeight: 'bold', color: '#001F2B' }}>
+          Balaji-Electronic
+
         </Typography>
       </div>
 
