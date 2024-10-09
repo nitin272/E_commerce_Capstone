@@ -75,8 +75,6 @@ auth.get('/auth/google/callback',
             });
 
             // Redirect to frontend (the cookie will be sent automatically)
-
-            res.redirect('https://balaji-electronic100.vercel.app');
             res.redirect('https://scale-mart1.vercel.app/');
 
         } catch (error) {
