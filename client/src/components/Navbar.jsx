@@ -67,13 +67,11 @@ const Navbar = forwardRef(() => {
 
         <img src={logo} alt="logo" className={`h-12 object-cover mr-2 ${isTablet ? 'h-10' : 'h-16'}`} />
         <Typography variant="h5" component="h4" className={`text-xl ${isTablet ? 'text-lg' : 'text-2xl'} font-bold`} sx={{ fontFamily: 'serif', color: '#001F2B' }}>
-Scale Mart
-
-        <img src={logo} alt="logo" className='h-16 object-cover mr-4' />
-        <Typography variant="h4" component="h1" sx={{ fontFamily: 'serif', fontWeight: 'bold', color: '#001F2B' }}>
-          Balaji-Electronic
+        Scale Mart
 
         </Typography>
+
+      
       </div>
 
       {/* Right Side (Buttons/Menu) */}
