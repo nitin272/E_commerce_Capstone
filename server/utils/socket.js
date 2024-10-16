@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const app = express();
 
 const allowedOrigins = [
-  'http://localhost:4500', 
+  'http://localhost:4500',"https://e-commerce-capstone.onrender.com","http://e-commerce-capstone.onrender.com","https://scale-mart1.vercel.app", 
   // other allowed origins can be added here
 ];
 
