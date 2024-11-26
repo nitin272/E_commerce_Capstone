@@ -64,13 +64,13 @@ auth.get('/auth/google/callback',
     async (req, res) => {
         try {
             // Generate JWT for the authenticated user
-            const token = jwt.sign({ id: req.user._id, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ id: req.user._id, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
             // Set the JWT as an HTTP-only cookie
             res.cookie('jwt', token, {
                 httpOnly: true, // Prevents access via JavaScript
                 secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                maxAge: 3600000,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
                 sameSite: "None"
             });
 
