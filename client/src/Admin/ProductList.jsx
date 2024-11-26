@@ -257,16 +257,7 @@ const Products = () => {
                                             {product.productName}
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
-                                            <strong>Category:</strong> {product.category}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            <strong>Price:</strong> ₹{product.price.toFixed(2)}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
                                             <strong>Stock:</strong> {product.stock}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            <strong>Description:</strong> {product.description}
                                         </Typography>
                                     </CardContent>
                                     <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e0e0e0' }}>
@@ -315,25 +306,6 @@ const Products = () => {
                                 label="Product Name"
                                 name="productName"
                                 value={productData.productName}
-                                onChange={handleChange}
-                                fullWidth
-                                required
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Description"
-                                name="description"
-                                value={productData.description}
-                                onChange={handleChange}
-                                fullWidth
-                                required
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Price"
-                                name="price"
-                                type="number"
-                                value={productData.price}
                                 onChange={handleChange}
                                 fullWidth
                                 required
