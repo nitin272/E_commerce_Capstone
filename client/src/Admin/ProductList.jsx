@@ -245,13 +245,20 @@ const Products = () => {
                         {filteredProducts.map((product) => (
                             <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                                 <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2, boxShadow: 3 }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="140"
-                                        image={product.productImgUrls[0] || 'default-image-url'}
-                                        alt={product.productName}
-                                        sx={{ objectFit: 'cover', borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
-                                    />
+                                <CardMedia
+    component="img"
+    image={product.productImgUrls[0] || 'default-image-url'}
+    alt={product.productName}
+    sx={{
+        width: '100%', // Ensures the image fits the width of the card
+        height: 200, // Fixed height for uniformity
+        objectFit: 'contain', // Ensures the entire image is visible within the given space
+        borderTopLeftRadius: 2,
+        borderTopRightRadius: 2,
+        backgroundColor: '#f5f5f5', // Optional: Adds a background to handle images with transparency
+    }}
+/>
+
                                     <CardContent sx={{ flexGrow: 1 }}>
                                         <Typography variant="h6" component="h2" color="primary">
                                             {product.productName}
