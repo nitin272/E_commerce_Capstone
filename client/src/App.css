@@ -3,3 +3,40 @@
     padding: 0;
 }
 
+.notification {
+    position: fixed; /* Fixed position */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Offset the element */
+    background-color: #fff; /* White background */
+    padding: 20px; /* Some padding */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 1000; /* Make sure it appears above other elements */
+    text-align: center; /* Center the text */
+}
+
+
+.sender-message::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: -5px; /* Adjust based on your layout */
+    width: 10px;
+    height: 10px;
+    background: inherit; /* Match bubble color */
+    transform: rotate(45deg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.receiver-message::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: -5px; /* Adjust based on your layout */
+    width: 10px;
+    height: 10px;
+    background: inherit; /* Match bubble color */
+    transform: rotate(45deg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

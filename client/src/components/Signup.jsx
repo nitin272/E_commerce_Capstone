@@ -4,11 +4,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logo.png'; // Ensure this is the correct path for your logo
 
 import { Button, TextField, InputAdornment, IconButton } from '@mui/material/';
-import { Visibility, VisibilityOff, Google, PermIdentity, Lock } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Google, PermIdentity, Lock, Token } from '@mui/icons-material';
 import { Login } from '@mui/icons-material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { requestPermission, saveFcmToken } from '../Service/Firebase';
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -43,7 +43,8 @@ const Signup = () => {
             username: email,
             password,
             otp,
-            validOtp
+            validOtp,
+            fcmToken: Token,
           }).then(res => {
             localStorage.setItem("id", res.data._id);
             navigate('/');
@@ -76,9 +77,15 @@ const Signup = () => {
     }
   };
 
-  const googleSignup = () => {
-    window.open(`${apiUrl}/auth/google/callback`, "_self");
+  const googleSignup = async () => {
+    // Request permission for notifications and get the token
+    const token = await requestPermission();
+    console.log("token form frontend googel login",token);
+  
+    // Redirect to Google OAuth with the FCM token as a query parameter
+    window.open(`${apiUrl}/auth/google/callback?fcmToken=${token}`, "_self");
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">

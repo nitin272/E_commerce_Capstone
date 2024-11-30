@@ -2,15 +2,24 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Container, Grid, Box, Typography, CardContent } from '@mui/material';
-import { Person, Storefront } from '@mui/icons-material'; // Icons for Users and Products
-import Footer from '../components/footer.jsx'; // Import Footer
+import {
+    Button,
+    Container,
+    Box,
+    Typography,
+    Divider,
+    Tabs,
+    Tab,
+    Paper,
+} from '@mui/material';
+import { Person, Storefront } from '@mui/icons-material';
+import Footer from '../components/footer.jsx';
 import Navbar from '../components/Navbar';
-import Users from './user'; 
-import Products from './ProductList'; 
+import Users from './user';
+import Products from './ProductList';
 
 const AdminPanel = () => {
-    const [selectedSection, setSelectedSection] = useState('users'); // State for selected section
+    const [selectedSection, setSelectedSection] = useState('users');
     const apiUrl = import.meta.env.VITE_APP_API_URL;
 
     const handleEditProduct = async (productId, updatedData) => {
@@ -22,93 +31,80 @@ const AdminPanel = () => {
         }
     };
 
+    const handleTabChange = (_, newValue) => {
+        setSelectedSection(newValue);
+    };
+
     return (
-        <Container maxWidth="lg" sx={{
-            marginTop: "18vh",
-            minHeight: '100vh',
-            color: '#333',
-            paddingBottom: '50px', // Ensure footer is not overlapping
-        }}>
+        <Container maxWidth="lg" sx={{ mt: 12, minHeight: '100vh', pb: 8 }}>
+            {/* Navbar */}
             <Navbar />
 
-            
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 4
-                }}>
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                        Admin Panel
-                    </Typography>
-                </Box>
+            {/* Admin Panel Header */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Typography variant="h4" fontWeight="bold" gutterBottom>
+                    Admin Panel
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    Manage users and products with ease.
+                </Typography>
+            </Box>
 
-                {/* Navigation for Users and Products in one line */}
-                <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
-                    <Grid item>
-                        <Button
-                            variant={selectedSection === 'users' ? 'contained' : 'outlined'}
-                            startIcon={<Person />}
-                            color="primary"
-                            onClick={() => setSelectedSection('users')}
-                            sx={{
-                                padding: '10px 20px',
-                                fontWeight: selectedSection === 'users' ? 'bold' : 'normal',
-                                boxShadow: selectedSection === 'users' ? 3 : 0,
-                                '&:hover': { 
-                                    transform: 'scale(1.05)', 
-                                    boxShadow: 6 
-                                },
-                                transition: 'all 0.2s ease',
-                                borderRadius: '20px',
-                            }}
-                        >
-                            Users
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button
-                            variant={selectedSection === 'products' ? 'contained' : 'outlined'}
-                            startIcon={<Storefront />}
-                            color="primary"
-                            onClick={() => setSelectedSection('products')}
-                            sx={{
-                                padding: '10px 20px',
-                                fontWeight: selectedSection === 'products' ? 'bold' : 'normal',
-                                boxShadow: selectedSection === 'products' ? 3 : 0,
-                                '&:hover': { 
-                                    transform: 'scale(1.05)', 
-                                    boxShadow: 6 
-                                },
-                                transition: 'all 0.2s ease',
-                                borderRadius: '20px',
-                            }}
-                        >
-                            Products
-                        </Button>
-                    </Grid>
-                </Grid>
+            <Divider sx={{ mb: 4 }} />
 
-                {/* Section Transitions */}
-                <CardContent sx={{ p: 0 }}>
-                    <Box sx={{
-                        transition: 'opacity 0.5s ease-in-out, visibility 0.5s ease-in-out',
-                        opacity: selectedSection === 'users' ? 1 : 0,
-                        visibility: selectedSection === 'users' ? 'visible' : 'hidden',
-                    }}>
-                        {selectedSection === 'users' && <Users />}
+            {/* Tabs for Section Navigation */}
+            <Paper
+                elevation={3}
+                sx={{
+                    position: 'sticky',
+                    top: 64,
+                    zIndex: 10,
+                    borderRadius: 2,
+                }}
+            >
+                <Tabs
+                    value={selectedSection}
+                    onChange={handleTabChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    centered
+                >
+                    <Tab
+                        value="users"
+                        label="Users"
+                        icon={<Person />}
+                        sx={{
+                            textTransform: 'capitalize',
+                            fontWeight: 'medium',
+                        }}
+                    />
+                    <Tab
+                        value="products"
+                        label="Products"
+                        icon={<Storefront />}
+                        sx={{
+                            textTransform: 'capitalize',
+                            fontWeight: 'medium',
+                        }}
+                    />
+                </Tabs>
+            </Paper>
+
+            {/* Content Sections */}
+            <Box sx={{ mt: 4 }}>
+                {selectedSection === 'users' && (
+                    <Box sx={{ animation: 'fadeIn 0.5s ease-in-out' }}>
+                        <Users />
                     </Box>
-
-                    <Box sx={{
-                        transition: 'opacity 0.5s ease-in-out, visibility 0.5s ease-in-out',
-                        opacity: selectedSection === 'products' ? 1 : 0,
-                        visibility: selectedSection === 'products' ? 'visible' : 'hidden',
-                    }}>
-                        {selectedSection === 'products' && <Products handleEditProduct={handleEditProduct} />}
+                )}
+                {selectedSection === 'products' && (
+                    <Box sx={{ animation: 'fadeIn 0.5s ease-in-out' }}>
+                        <Products handleEditProduct={handleEditProduct} />
                     </Box>
-                </CardContent>
-        
+                )}
+            </Box>
 
+            {/* Footer */}
             <Footer />
         </Container>
     );

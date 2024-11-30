@@ -2,3 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide the default scrollbar */
+.messages-container {
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+/* For Webkit browsers like Chrome and Safari */
+.messages-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* For Firefox */
+.messages-container {
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+}
+
+/* For Internet Explorer and Edge */
+.messages-container {
+    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+}
+
+/* If you want to enable scrolling for the content but not show a scrollbar */
+.messages-container {
+    overflow-y: scroll; /* Allow vertical scrolling */
+    scrollbar-width: none; /* Firefox */
+}
+
+.messages-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
