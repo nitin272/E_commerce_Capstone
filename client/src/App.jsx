@@ -37,6 +37,10 @@ function App() {
     <>
       <NotificationPermission />
 
+
+
+      <NotificationPermission />
+
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/profile' element={<Profile />} />
