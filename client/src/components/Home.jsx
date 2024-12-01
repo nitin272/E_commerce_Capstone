@@ -31,7 +31,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/products'); 
+        const response = await axios.get(`${apiUrl}/products`); 
         const products = response.data;
         setProducts(products);
         setFilteredProducts(products); 
