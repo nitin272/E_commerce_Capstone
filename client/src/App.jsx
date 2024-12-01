@@ -13,14 +13,14 @@ import ChatList from './components/ChatList';
 import AdminDashboard from './Admin/Dashboard';
 import ProductDetail from './components/DetailProduct';
 import ContactPage from './components/Contact';
-import { requestPermission} from './Service/Firebase'; // Firebase functions
-import { Toaster, toast } from 'react-hot-toast'; // React Hot Toast for notifications
+import { requestPermission} from './Service/Firebase'; 
+import { Toaster, toast } from 'react-hot-toast'; 
 
 function App() {
-  const [user, setUser] = useState(null); // User state to manage authentication
+  const [user, setUser] = useState(null); 
 
   useEffect(() => {
-    // Request notification permissions when the app loads
+
     const requestNotificationPermission = async () => {
       const permission = await requestPermission();
       if (permission) {

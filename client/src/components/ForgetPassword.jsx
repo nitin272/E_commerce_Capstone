@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const onSendbtn = async (e) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ const ForgetPassword = () => {
       toast.success('Please check your email for further instructions.');
       setTimeout(() => {
         navigate('/login');
-      }, 3000); // Redirect after 3 seconds
+      }, 3000); 
     } catch (error) {
       toast.error('An error occurred. Please try again.');
     }

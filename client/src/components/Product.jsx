@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Footer from './footer.jsx';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import axios from 'axios';
-import SearchFilter from './Search'; // Import the SearchFilter component
+import SearchFilter from './Search'; 
 import { Login } from '@mui/icons-material';
 import { Login as LoginIcon } from '@mui/icons-material'; 
 
@@ -18,9 +18,9 @@ const Product = () => {
     const [alert, setAlert] = useState('');
     const [loading, setLoading] = useState(true);
     const [openLoginDialog, setOpenLoginDialog] = useState(false);
-    const [isEnquiring, setIsEnquiring] = useState(false); // Added state for enquiry feedback
+    const [isEnquiring, setIsEnquiring] = useState(false);
     
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = 'https://e-commerce-capstone.onrender.com';
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,8 +34,6 @@ const Product = () => {
                     withCredentials: true
                 });
                 setProducts(productsResponse.data);
-
-                // Extract unique categories from product data
                 const uniqueCategories = [...new Set(productsResponse.data.map(product => product.category))];
                 setCategories(uniqueCategories.map(category => ({ value: category, label: category })));
             } catch (err) {
@@ -58,18 +56,16 @@ const Product = () => {
 
     const checkIfLoggedIn = async () => {
         try {
-            // Make the API call and wait for the response
+
             const response = await axios.get(`${apiUrl}/login/success`, { withCredentials: true });
-    
-            // Check if the response contains the expected user data
             if (response.data && response.data.userId) {
-                return true;  // User is logged in
+                return true;  
             } else {
-                return false; // No user data, so not logged in
+                return false; 
             }
         } catch (error) {
             console.error('Error checking login status:', error);
-            return false;  // Return false if there's an error with the request
+            return false; 
         }
     };
     
@@ -78,7 +74,7 @@ const Product = () => {
         if (checkIfLoggedIn()) {
             navigate(`/products/${id}`);
         } else {
-            setOpenLoginDialog(true); // Open login dialog if not logged in
+            setOpenLoginDialog(true); 
         }
     };
 
@@ -89,14 +85,14 @@ const Product = () => {
                 const { productName, category, description, productImgUrls, _id } = product;
                 const productUrl = `${window.location.origin}/products/${_id}`;
 
-                const imageUrl = productImgUrls[0]; // First image URL
+                const imageUrl = productImgUrls[0];
 
                 const whatsappMessage = `Hello! 🌟\n\n` +
                     `I'm interested in learning more about the following product:\n\n` +
                     `*Product Name:* ${productName}\n` +
                     `*Category:* ${category}\n` +
                     `*Description:* ${description}\n` +
-                    `*Product Link:* ${productUrl}\n` + // Product detail link
+                    `*Product Link:* ${productUrl}\n` + 
                     `*Image:* ${imageUrl}\n\n` +
                     `Could you please provide more details? Thank you! 🙏`;
 
@@ -109,7 +105,7 @@ const Product = () => {
                 setIsEnquiring(false);
             }
         } else {
-            setOpenLoginDialog(true); // Open login dialog if not logged in
+            setOpenLoginDialog(true); 
         }
     };
 
@@ -117,8 +113,8 @@ const Product = () => {
         setOpenLoginDialog(false);
     };
     const handleLoginRedirect = () => {
-        navigate('/login'); // Redirect to login page
-        setOpenLoginDialog(false); // Close the dialog
+        navigate('/login'); 
+        setOpenLoginDialog(false); 
     };
 
     const handleSearchChange = (inputValue) => {
@@ -137,11 +133,11 @@ const Product = () => {
 
     const stockStatus = (stock) => {
         if (stock === 0) {
-            return { message: 'No stock available', className: 'text-red-600' }; // Red color for no stock
+            return { message: 'No stock available', className: 'text-red-600' }; 
         } else if (stock < 10) {
-            return { message: 'Limited stock', className: 'text-yellow-600' }; // Yellow color for limited stock
+            return { message: 'Limited stock', className: 'text-yellow-600' };
         } else {
-            return { message: 'In stock', className: 'text-green-600' }; // Green color for available stock
+            return { message: 'In stock', className: 'text-green-600' }; 
         }
     };
 
@@ -158,7 +154,7 @@ const Product = () => {
         useEffect(() => {
             const interval = setInterval(() => {
                 handleCarouselChange(1);
-            }, 5000); // Change image every 5 seconds
+            }, 5000);
 
             return () => clearInterval(interval);
         }, [currentIndex]);
@@ -180,17 +176,16 @@ const Product = () => {
                         <div key={index} className="min-w-full">
                           <CardMedia
     component="img"
-    image={img || 'default-image-url'} // Fallback to a default image if `img` is undefined
+    image={img || 'default-image-url'} 
     alt={`Product Image ${index}`}
     sx={{
-        width: '100%', // Ensures the image fits the width of the card
-        height: 200, // Fixed height for uniformity
-        objectFit: 'contain', // Ensures the entire image is visible within the given space
-        borderRadius: '8px', // Applies rounded corners to all edges
-        backgroundColor: '#f5f5f5', // Optional: Adds a background to handle transparent images
+        width: '100%', 
+        height: 200, 
+        objectFit: 'contain', 
+        borderRadius: '8px', 
+        backgroundColor: '#f5f5f5', 
     }}
 />
-
                         </div>
                     ))}
                 </div>
@@ -302,7 +297,7 @@ const Product = () => {
                                                         color="primary"
                                                         onClick={() => handleMoreInfo(product._id)}
                                                         sx={{
-                                                            padding: { xs: '8px 12px', sm: '10px 16px' },  // Smaller padding for extra-small screens
+                                                            padding: { xs: '8px 12px', sm: '10px 16px' }, 
                                                         }}
                                                     >
                                                         More Info
@@ -312,7 +307,7 @@ const Product = () => {
                                                             color="primary"
                                                             onClick={() => handleEnquiry(product)}
                                                             disabled={isEnquiring}
-                                                            startIcon={<WhatsAppIcon />} // Add the WhatsApp icon here
+                                                            startIcon={<WhatsAppIcon />}
                                                         >
                                                             {isEnquiring ? 'Enquiring...' : 'Enquire'}
                                                         </Button>

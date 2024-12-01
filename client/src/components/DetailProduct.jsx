@@ -15,20 +15,19 @@ const ProductDetail = () => {
     const [isEnquiring, setIsEnquiring] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useEffect(() => {
         const fetchProductAndAllProducts = async () => {
             try {
-                // Fetch current product details
                 const response = await axios.get(`${apiUrl}/products/${id}`, { withCredentials: true });
                 setProduct(response.data);
 
-                // Fetch all products
+    
                 const allProductsResponse = await axios.get(`${apiUrl}/products`, { withCredentials: true });
                 setAllProducts(allProductsResponse.data);
 
-                // Filter related products based on category, excluding the current product
+           
                 const filteredRelatedProducts = allProductsResponse.data.filter(product => 
                     product.category === response.data.category && product._id !== response.data._id
                 );
@@ -108,7 +107,7 @@ const ProductDetail = () => {
                 {product.productName}
             </Typography>
 
-            {/* Carousel for Product Images */}
+    
             <Carousel className="mt-4">
                 {product.productImgUrls && Array.isArray(product.productImgUrls) && product.productImgUrls.length > 0 ? (
                     product.productImgUrls.map((img, index) => (
@@ -124,7 +123,7 @@ const ProductDetail = () => {
                                     maxWidth: '100%',
                                     maxHeight: '400px',
                                     objectFit: 'contain',
-                                    backgroundColor: '#f0f0f0', // Light background for image area
+                                    backgroundColor: '#f0f0f0',
                                 }}
                             />
                         </div>
@@ -134,7 +133,7 @@ const ProductDetail = () => {
                 )}
             </Carousel>
 
-            {/* Product Details Card */}
+
             <Card elevation={6} style={{ marginTop: '24px', borderRadius: '12px', backgroundColor: '#f9f9f9' }}>
                 <CardContent>
                     <Grid container spacing={2}>
@@ -161,7 +160,7 @@ const ProductDetail = () => {
                         {product.description ? product.description.slice(0, 100) : 'No description available'}
                     </Typography>
 
-                    {/* Enquiry Button */}
+     
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
                         <Button
                             variant="contained"
@@ -180,7 +179,7 @@ const ProductDetail = () => {
                 </CardContent>
             </Card>
 
-            {/* Related Products Section */}
+
             <div style={{ marginTop: '40px', padding: '20px', backgroundColor: '#f4f4f4' }}>
     <Typography
         variant="h4"
@@ -214,7 +213,7 @@ const ProductDetail = () => {
                         onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                         onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        {/* Image container with background */}
+    
                         <div
                             style={{
                                 position: 'relative',
@@ -234,7 +233,7 @@ const ProductDetail = () => {
                                         height: 'auto',
                                         maxHeight: '250px',
                                         objectFit: 'contain',
-                                        backgroundColor: '#f0f0f0', // Light background for image area
+                                        backgroundColor: '#f0f0f0', 
                                     }}
                                 />
                             ) : (
@@ -252,7 +251,7 @@ const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Product Name and Price */}
+              
                         <Typography
                             variant="h6"
                             style={{
@@ -277,7 +276,7 @@ const ProductDetail = () => {
                             ₹{relatedProduct.price}
                         </Typography>
 
-                        {/* View Product Button */}
+           
                         <div style={{ textAlign: 'center' }}>
                             <Button
                                 variant="contained"

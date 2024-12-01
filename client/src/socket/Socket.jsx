@@ -14,7 +14,7 @@ export const SocketContextProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const {selectedConversation,conversation_Id } = useConversation()
 
-  const apiUrl = import.meta.env.VITE_APP_API_URL
+  const apiUrl = "https://e-commerce-capstone.onrender.com"
   const fetchUser = async () => {
     try {
       const id = localStorage.getItem('id')
@@ -35,8 +35,6 @@ export const SocketContextProvider = ({ children }) => {
   },[])
   useEffect(() => {
     if (user ) {
-      // console.log("selectedConversation",selectedConversation);
-      // console.log('selectedConversation',selectedConversation? selectedConversation._id: null);
       console.log("conversation_Id in getMEssage",conversation_Id);
 
       const socket = io(`${apiUrl}`, {
@@ -45,7 +43,6 @@ export const SocketContextProvider = ({ children }) => {
           conversationId : conversation_Id
         }
       })
-      // console.log("socket", socket);
       setRun(true)
       socket.on('getOnlineUSer', (users) => {
         setOnlineUser(users)
@@ -57,10 +54,7 @@ export const SocketContextProvider = ({ children }) => {
     } else {
       setSocket(null)
       setOnlineUser([])
-      // if (socket) {
-      //   socket.close()
-      //   setSocket(null)
-      // }
+
     }
 
   }, [user,run,selectedConversation,conversation_Id])

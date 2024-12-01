@@ -8,7 +8,6 @@ const { app, server } = require('./utils/socket');
 const { sendNotification } = require('./utils/nodeMailer');
 
 const admin  = require("./utils/FireBaseAdmin");
-// Middleware to parse JSON bodies
 
 
 require('dotenv').config();
@@ -21,7 +20,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   'http://localhost:4500', "http://localhost:4000" ,"https://e-commerce-capstone.onrender.com","http://e-commerce-capstone.onrender.com","https://scale-mart1.vercel.app",
-  // other allowed origins can be added here
+
 ];
 
 
@@ -30,7 +29,7 @@ const corsOptions = {
 
 
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -39,13 +38,13 @@ const corsOptions = {
     return callback(null, true);
   },
   credentials: true,
-  optionsSuccessStatus: 200, // For legacy browser support
+  optionsSuccessStatus: 200, 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight requests for all routes
+app.options('*', cors(corsOptions)); 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -68,19 +67,19 @@ server.listen(port, () => {
 
 const { MongoClient } = require('mongodb');
 
-const uri = "mongodb+srv://Nitin:Nitin@cluster0.w5qqoa0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; // Replace with your MongoDB URI
+const uri = "mongodb+srv://Nitin:Nitin@cluster0.w5qqoa0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; 
 
 async function listUserEmails() {
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
   try {
     await client.connect();
-    const database = client.db("Shop"); // Replace with your database name
-    const usersCollection = database.collection("user"); // Replace with your user collection name
+    const database = client.db("Shop"); 
+    const usersCollection = database.collection("user"); 
 
     const users = await usersCollection.find().toArray();
     users.forEach(user => {
-      console.log(user.email); // Assuming 'email' is a field in your user documents
+      console.log(user.email); 
     });
   } finally {
     await client.close();
@@ -89,9 +88,9 @@ async function listUserEmails() {
 
 app.post('/send-notification', (req, res) => {
   const { token, title, body } = req.body;
-  // console.log('Received notification request:', req.body);
+
   
-  // Check if token, title, and body are provided
+
   if (!token || !title || !body) {
       console.error('Error: Missing token, title, or body');
       return res.status(400).send('Missing token, title, or body');
@@ -106,7 +105,6 @@ app.post('/send-notification', (req, res) => {
 
   admin.messaging().send(message)
       .then((response) => {
-          // console.log('Notification sent successfully:', response);
           res.send('Notification sent');
       })
       .catch((error) => {

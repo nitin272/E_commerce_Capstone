@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -34,7 +34,7 @@ const ResetPassword = () => {
     axios.post(`${apiUrl}/resetPassword/${id}/${token}`, { password })
       .then((res) => {
         toast.success('Password reset successfully. Redirecting to login.');
-        setTimeout(() => navigate('/login'), 2000); // Redirect after a short delay
+        setTimeout(() => navigate('/login'), 2000); 
       })
       .catch(err => {
         toast.error('Failed to reset password. Please try again.');
