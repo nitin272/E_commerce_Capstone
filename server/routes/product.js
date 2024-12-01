@@ -8,7 +8,7 @@ const isAdmin = require('../middleware/IsAdmin.middleware');
 
 
 
-router.get('/',authMiddleware, productController.getAllProducts);
+router.get('/', productController.getAllProducts);
 
 router.get('/:productId',authMiddleware, productController.getProductById);
 

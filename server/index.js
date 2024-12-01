@@ -1,11 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const product = require('./routes/product');
-
 const auth = require('./routes/auth');
 const message = require('./routes/messages');
 const cors = require('cors');
 const { app, server } = require('./utils/socket');
+const { sendNotification } = require('./utils/nodeMailer');
+
+const admin  = require("./utils/FireBaseAdmin");
+// Middleware to parse JSON bodies
+
+
 require('dotenv').config();
 const port = 4000;
 
@@ -18,6 +23,9 @@ const allowedOrigins = [
   'http://localhost:4500', "http://localhost:4000" ,"https://e-commerce-capstone.onrender.com","http://e-commerce-capstone.onrender.com","https://scale-mart1.vercel.app",
   // other allowed origins can be added here
 ];
+
+
+
 const corsOptions = {
 
 
@@ -78,5 +86,33 @@ async function listUserEmails() {
     await client.close();
   }
 }
+
+app.post('/send-notification', (req, res) => {
+  const { token, title, body } = req.body;
+  // console.log('Received notification request:', req.body);
+  
+  // Check if token, title, and body are provided
+  if (!token || !title || !body) {
+      console.error('Error: Missing token, title, or body');
+      return res.status(400).send('Missing token, title, or body');
+  }
+  const message = {
+      notification: {
+          title: title,
+          body: body,
+      },
+      token: token,
+  };
+
+  admin.messaging().send(message)
+      .then((response) => {
+          // console.log('Notification sent successfully:', response);
+          res.send('Notification sent');
+      })
+      .catch((error) => {
+          console.error('Error sending notification:', error);
+          res.status(500).send('Error sending notification');
+      });
+});
 
 listUserEmails().catch(console.error);

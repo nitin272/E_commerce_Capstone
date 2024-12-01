@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Alert, AlertTitle, CircularProgress, Typography, Card, CardContent, CardMedia } from '@mui/material';
+import { Button, Alert, AlertTitle, CircularProgress, Typography, Card, CardContent, CardMedia,Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import Navbar from './Navbar';
 import Footer from './footer.jsx';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import axios from 'axios';
 import SearchFilter from './Search'; // Import the SearchFilter component
+import { Login } from '@mui/icons-material';
+import { Login as LoginIcon } from '@mui/icons-material'; 
+
 
 const Product = () => {
     const [products, setProducts] = useState([]);
@@ -13,7 +17,9 @@ const Product = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [alert, setAlert] = useState('');
     const [loading, setLoading] = useState(true);
+    const [openLoginDialog, setOpenLoginDialog] = useState(false);
     const [isEnquiring, setIsEnquiring] = useState(false); // Added state for enquiry feedback
+    
     const apiUrl = import.meta.env.VITE_APP_API_URL;
     const navigate = useNavigate();
 
@@ -50,36 +56,69 @@ const Product = () => {
         }
     }, [alert]);
 
+    const checkIfLoggedIn = async () => {
+        try {
+            // Make the API call and wait for the response
+            const response = await axios.get(`${apiUrl}/login/success`, { withCredentials: true });
+    
+            // Check if the response contains the expected user data
+            if (response.data && response.data.userId) {
+                return true;  // User is logged in
+            } else {
+                return false; // No user data, so not logged in
+            }
+        } catch (error) {
+            console.error('Error checking login status:', error);
+            return false;  // Return false if there's an error with the request
+        }
+    };
+    
+
     const handleMoreInfo = (id) => {
-        navigate(`/products/${id}`);
+        if (checkIfLoggedIn()) {
+            navigate(`/products/${id}`);
+        } else {
+            setOpenLoginDialog(true); // Open login dialog if not logged in
+        }
     };
 
     const handleEnquiry = async (product) => {
-        setIsEnquiring(true);
-        try {
-            const { productName, category, description, productImgUrls, _id } = product;
-            const productUrl = `${window.location.origin}/products/${_id}`;
+        if (checkIfLoggedIn()) {
+            setIsEnquiring(true);
+            try {
+                const { productName, category, description, productImgUrls, _id } = product;
+                const productUrl = `${window.location.origin}/products/${_id}`;
 
-            const imageUrl = productImgUrls[0]; // First image URL
+                const imageUrl = productImgUrls[0]; // First image URL
 
-            // Improved WhatsApp message
-            const whatsappMessage = `Hello! 🌟\n\n` +
-                `I'm interested in learning more about the following product:\n\n` +
-                `*Product Name:* ${productName}\n` +
-                `*Category:* ${category}\n` +
-                `*Description:* ${description.slice(0, 100)}...\n\n` + // Limiting description to 100 characters
-                `*Product Link:* ${productUrl}\n` + // Product detail link
-                `*Image:* ${imageUrl}\n\n` +
-                `Could you please provide more details? Thank you! 🙏`;
+                const whatsappMessage = `Hello! 🌟\n\n` +
+                    `I'm interested in learning more about the following product:\n\n` +
+                    `*Product Name:* ${productName}\n` +
+                    `*Category:* ${category}\n` +
+                    `*Description:* ${description}\n` +
+                    `*Product Link:* ${productUrl}\n` + // Product detail link
+                    `*Image:* ${imageUrl}\n\n` +
+                    `Could you please provide more details? Thank you! 🙏`;
 
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-            const whatsappUrl = `https://wa.me/${9413262126}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-        } catch (error) {
-            console.error('Error opening WhatsApp:', error);
-        } finally {
-            setIsEnquiring(false);
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                const whatsappUrl = `https://wa.me/${9413262126}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
+            } catch (error) {
+                console.error('Error opening WhatsApp:', error);
+            } finally {
+                setIsEnquiring(false);
+            }
+        } else {
+            setOpenLoginDialog(true); // Open login dialog if not logged in
         }
+    };
+
+    const handleLoginDialogClose = () => {
+        setOpenLoginDialog(false);
+    };
+    const handleLoginRedirect = () => {
+        navigate('/login'); // Redirect to login page
+        setOpenLoginDialog(false); // Close the dialog
     };
 
     const handleSearchChange = (inputValue) => {
@@ -139,18 +178,19 @@ const Product = () => {
                 <div className="flex transition-transform duration-700 ease-in-out" ref={carouselRef}>
                     {images.map((img, index) => (
                         <div key={index} className="min-w-full">
-                            <CardMedia
-                                component="img"
-                                height="200" // Fixed height for uniformity
-                                image={img}
-                                alt={`Product Image ${index}`}
-                                sx={{
-                                    borderRadius: '8px',
-                                    objectFit: 'cover', // Maintain aspect ratio
-                                    maxHeight: '200px', // Ensures all images are the same height
-                                    minHeight: '200px', // Ensures minimum height is maintained
-                                }}
-                            />
+                          <CardMedia
+    component="img"
+    image={img || 'default-image-url'} // Fallback to a default image if `img` is undefined
+    alt={`Product Image ${index}`}
+    sx={{
+        width: '100%', // Ensures the image fits the width of the card
+        height: 200, // Fixed height for uniformity
+        objectFit: 'contain', // Ensures the entire image is visible within the given space
+        borderRadius: '8px', // Applies rounded corners to all edges
+        backgroundColor: '#f5f5f5', // Optional: Adds a background to handle transparent images
+    }}
+/>
+
                         </div>
                     ))}
                 </div>
@@ -193,6 +233,49 @@ const Product = () => {
                             onCategoryChange={handleCategoryChange}
                         />
 
+
+<Dialog open={openLoginDialog} onClose={handleLoginDialogClose} fullWidth maxWidth="sm">
+            <DialogTitle sx={{ fontWeight: 600, textAlign: 'center', color: '#333' }}>Please log in first</DialogTitle>
+            <DialogContent sx={{ paddingTop: '20px' }}>
+                <Typography variant="body1" sx={{ marginBottom: '20px', color: '#555' }}>
+                    You need to be logged in to view more information or make inquiries. Would you like to log in now?
+                </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: '20px' }}>
+                <Button
+                    onClick={handleLoginDialogClose}
+                    color="secondary"
+                    variant="outlined"
+                    sx={{
+                        padding: '10px 20px',
+                        fontWeight: '600',
+                        '&:hover': {
+                            backgroundColor: '#f4f4f4',
+                        },
+                    }}
+                    disabled={loading}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    onClick={handleLoginRedirect}
+                    color="primary"
+                    variant="contained"
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
+                    sx={{
+                        padding: '10px 20px',
+                        fontWeight: '600',
+                        backgroundColor: '#3f51b5',
+                        '&:hover': {
+                            backgroundColor: '#303f9f',
+                        },
+                    }}
+                    disabled={loading}
+                >
+                    {loading ? 'Logging in...' : 'Log In'}
+                </Button>
+            </DialogActions>
+        </Dialog>
                         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {filteredProducts.length > 0 ? (
                                 filteredProducts.map(product => {
@@ -208,9 +291,7 @@ const Product = () => {
                                                     <Typography variant="body1" className="text-gray-600">
                                                         Category: {product.category}
                                                     </Typography>
-                                                    <Typography variant="body1" className="text-gray-600">
-                                                        Price: ₹{product.price}
-                                                    </Typography>
+                                
                                                     <Typography variant="body1" className={`font-semibold ${stockInfo.className}`}>
                                                         {stockInfo.message}
                                                     </Typography>
@@ -227,16 +308,18 @@ const Product = () => {
                                                         More Info
                                                     </Button>
                                                     <Button
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        onClick={() => handleEnquiry(product)}
-                                                        disabled={isEnquiring}
-                                                    >
-                                                        {isEnquiring ? 'Enquiring...' : 'Enquire'}
-                                                    </Button>
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            onClick={() => handleEnquiry(product)}
+                                                            disabled={isEnquiring}
+                                                            startIcon={<WhatsAppIcon />} // Add the WhatsApp icon here
+                                                        >
+                                                            {isEnquiring ? 'Enquiring...' : 'Enquire'}
+                                                        </Button>
                                                 </div>
                                             </CardContent>
                                         </Card>
+
                                     );
                                 })
                             ) : (

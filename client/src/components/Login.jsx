@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; 
+import logo from '../assets/logo.png';
 import { Button, TextField, InputAdornment } from '@mui/material/';
 import { Google, Email, LockOpen } from '@mui/icons-material';
 import LoginIcon from '@mui/icons-material/Login';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, Toaster } from 'react-hot-toast';
+import { requestPermission, saveFcmToken } from '../Service/Firebase';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,15 +14,23 @@ const Login = () => {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-  // Handle login button click
   const onLoginBtn = async (e) => {
     e.preventDefault();
     try {
+
+      const token = await requestPermission();
+
       // Send login request to backend with credentials
       const response = await axios.post(`${apiUrl}/login`, {
         username: email,
-        password
-      }, { withCredentials: true }); // Added withCredentials
+        password,
+      }, { withCredentials: true });
+
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        await saveFcmToken(token); 
+      }
 
       toast.success('Login successful');
       navigate('/'); // Redirect to home page
@@ -40,7 +48,7 @@ const Login = () => {
           // Check token validity
           const response = await axios.get(`${apiUrl}/login/success`, {
             headers: { 'Authorization': `Bearer ${token}` },
-            withCredentials: true // Ensure credentials are included
+            withCredentials: true,
           });
           if (response.data.user) {
             navigate('/'); // Redirect if authenticated
@@ -53,18 +61,28 @@ const Login = () => {
     checkAuth();
   }, [navigate, apiUrl]);
 
-  // Google OAuth login
-  const googlePage = () => {
-    window.open(`${apiUrl}/auth/google/callback`, "_self");
+  const googlePage = async () => {
+    try {
+      const fcmToken = await requestPermission();
+      if (fcmToken) {
+        // Optionally send the FCM token to your server
+        const url = `${apiUrl}/auth/google`;
+        window.open(url, "_self"); // Redirect to Google auth page
+   
+      }
+      
+    } catch (error) {
+      console.error('Error opening Google auth page:', error);
+      toast.error('Google authentication failed.');
+    }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
+      <Toaster position="top-right" autoClose={5000} hideProgressBar />
       <div className="flex flex-col items-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-8 bg-white rounded-lg shadow-lg">
         <img src={logo} alt="Logo" className="mx-auto h-24 mb-4" />
         <h1 className="text-2xl font-bold mb-4">Scale Mart</h1>
-
         <h2 className="text-3xl font-light mb-4 text-center">Login</h2>
 
         <form onSubmit={onLoginBtn} className="flex flex-col space-y-4 w-full max-w-md">
@@ -80,7 +98,7 @@ const Login = () => {
                 <InputAdornment position="end">
                   <Email />
                 </InputAdornment>
-              )
+              ),
             }}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -97,7 +115,7 @@ const Login = () => {
                 <InputAdornment position="end">
                   <LockOpen />
                 </InputAdornment>
-              )
+              ),
             }}
             onChange={(e) => setPassword(e.target.value)}
           />

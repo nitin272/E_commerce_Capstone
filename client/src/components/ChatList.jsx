@@ -10,6 +10,12 @@ import useListenMessage from '../hooks/useListenMessage';
 import { TextField, Button, IconButton } from '@mui/material';
 import { AccountCircle, Menu as MenuIcon, Send as SendIcon } from '@mui/icons-material';
 
+import CheckIcon from '@mui/icons-material/Check';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import Tooltip from '@mui/material/Tooltip';
+// import { useRef, useEffect } from 'react';
+
+
 const ChatList = () => {
     const [user, setUser] = useState({});
     const [list, setList] = useState([]); // List of users for admin
@@ -29,6 +35,15 @@ const ChatList = () => {
     const { state } = location;
     const initialUserId = state?.userId; // Get userId from location state
     console.log('initialUserId:', initialUserId); // Log the initialUserId for debugging
+    // Inside your component
+
+// Whenever the messages array updates (e.g., new message received)
+useEffect(() => {
+    if (lastMessageRef.current) {
+        lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+}, [messages]); // This will trigger the effect when messages change
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -99,14 +114,13 @@ const ChatList = () => {
     };
 
     const renderChatHeader = () => (
-        <header className="flex items-center justify-between p-3 md:p-5 bg-white shadow-md border-b border-gray-200"
-            style={{ marginTop: "12vh" }}>
+        <header className="flex items-center justify-between p-3 md:p-5 bg-white shadow-md border-b border-gray-200" style={{ marginTop: "12vh" }}>
             
             {/* Sidebar Toggle for Admins */}
             {user.role === 'admin' && (
                 <IconButton
                     onClick={() => setIsSidebarOpen(prev => !prev)}
-                    className="text-gray-600 md:text-gray-700"
+                    className="text-gray-600 md:text-gray-700 hover:text-gray-800 transition duration-150 ease-in-out"
                 >
                     <MenuIcon style={{ fontSize: "30px" }} /> {/* Reduced font size for better fit */}
                 </IconButton>
@@ -120,16 +134,17 @@ const ChatList = () => {
                         <img 
                             src={selectedConversation.ownerImg[0]} 
                             alt="User" 
-                            className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                            className="h-12 w-12 rounded-full object-cover border-2 border-gray-300 shadow-sm"
                         />
                     ) : (
-                        <AccountCircle style={{ fontSize: "40px", color: 'gray' }} />
+                        <AccountCircle style={{ fontSize: "48px", color: 'gray' }} />
                     )}
                     
                     {/* User Details */}
-                    <div className="ml-3 overflow-hidden">
-                        <h1 className="text-base md:text-lg font-semibold text-gray-800 truncate">{selectedConversation.name || 'Unknown'}</h1>
-                        {/* <p className="text-xs md:text-sm text-gray-600 truncate">{selectedConversation.username || 'No email available'}</p> */}
+                    <div className="ml-5 overflow-hidden ">
+                        <h1 className="text-lg font-semibold text-gray-800 truncate">{selectedConversation.name || 'Unknown'}</h1>
+                        {/* Uncomment the line below to show the username or email */}
+                        {/* <p className="text-sm text-gray-600 truncate">{selectedConversation.username || 'No email available'}</p> */}
                     </div>
                 </div>
             ) : (
@@ -140,42 +155,69 @@ const ChatList = () => {
         </header>
     );
     
-
+    
     const renderMessages = () => {
         if (!selectedConversation) return null;
     
         return (
-            <div className="flex-1 p-4 overflow-auto"
-                style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/white-wall.png")', backgroundColor: '#f4f7fc' }}>
-                
+            <div
+                className="flex-1 p-4 overflow-auto"
+                style={{
+                    backgroundImage: 'url("https://www.transparenttextures.com/patterns/white-wall.png")',
+                    backgroundColor: '#f4f4f4', // Light neutral background for better contrast
+                }}
+            >
                 {messages.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-lg md:text-xl text-gray-600 text-center">
-                            Start a conversation with {selectedConversation.name}
+                        <p className="text-lg md:text-xl text-gray-700 text-center font-medium">
+                            Start a conversation with{' '}
+                            <span className="font-bold text-gray-900">{selectedConversation.name}</span>
                         </p>
                     </div>
                 ) : (
                     <div className="space-y-4">
                         {messages.map((message, index) => (
-                            <div 
-                                key={index} 
-                                ref={lastMessageRef} 
-                                className={`flex flex-col ${message.senderId === user._id ? 'items-end' : 'items-start'}`}
+                            <div
+                                key={index}
+                                className={`flex ${message.senderId === user._id ? 'justify-end' : 'justify-start'}`}
                             >
-                                <div className={`relative p-4 rounded-2xl max-w-[75%] md:max-w-[60%] shadow-md 
-                                    ${message.senderId === user._id ? 
-                                    'bg-gradient-to-r from-green-400 to-green-500 text-white' : 
-                                    'bg-white border border-gray-200 text-gray-800'}`}
+                                <div
+                                    className={`relative p-3 rounded-lg max-w-[75%] shadow-md transition duration-300 ease-in-out
+                                        ${
+                                            message.senderId === user._id
+                                                ? 'bg-gradient-to-r from-teal-400 to-green-300 text-gray-900'
+                                                : 'bg-white border border-gray-200 text-gray-800'
+                                        }`}
+                                    style={{
+                                        background: message.senderId === user._id
+                                            ? 'linear-gradient(135deg, #a0e9ce, #72c7a1)'
+                                            : '#fff',
+                                    }}
                                 >
-                                    <p className="text-base md:text-lg break-words">
-                                        {message.message}
-                                    </p>
+                                    <p className="text-base md:text-lg break-words">{message.message}</p>
+    
+                                    {message.photoUrl && (
+                                        <img
+                                            src={message.photoUrl}
+                                            alt={`Image sent by ${
+                                                message.senderId === user._id ? 'you' : selectedConversation.name
+                                            }`}
+                                            className="mt-2 rounded-lg max-w-xs shadow-md border border-gray-300"
+                                            onLoad={() => console.log('Image loaded')}
+                                        />
+                                    )}
+    
+                                    {/* Message Status and Timestamp Indicators */}
+                                    {message.senderId === user._id && (
+                                        <div className="flex items-center justify-between text-xs mt-1">
+                                            <p className="text-gray-500">{abstractTime(message.createdAt)}</p>
+                                            <MessageStatusIndicator status={message.status} />
+                                        </div>
+                                    )}
                                 </div>
     
-                                {/* Aligned timestamp below the message */}
-                                <p className={`text-xs md:text-sm text-gray-500 mt-1 ${message.senderId === user._id ? 'text-right' : 'text-left'}`}>
-                                    {abstractTime(message.createdAt)}
-                                </p>
+                                {/* Space for the last message */}
+                                {index === messages.length - 1 && <div ref={lastMessageRef} className="h-4" />}
                             </div>
                         ))}
                     </div>
@@ -185,72 +227,112 @@ const ChatList = () => {
     };
     
     
-    
 
-   const renderMessageInput = () => (
-    <div 
-        className='p-4 bg-gray-100 border-t border-gray-300 flex justify-center items-center' 
-        style={{
-            position: 'sticky', 
-            bottom: 0, 
+
+const MessageStatusIndicator = ({ status }) => {
+  const statusIcons = {
+    offline: (
+      <Tooltip title="Message not delivered">
+        <CheckIcon className="text-gray-400" />
+      </Tooltip>
+    ), // Single gray tick for offline (not delivered)
+    delivered: (
+      <Tooltip title="Message delivered">
+        <DoneAllIcon className="text-gray-400" />
+      </Tooltip>
+    ), // Double gray ticks for delivered but not read
+    read: (
+      <Tooltip title="Message read">
+        <DoneAllIcon className="text-blue-500 animate-pulse" />
+      </Tooltip>
+    ), // Double blue ticks with animation for read
+  };
+
+  return (
+    <div className="flex items-center space-x-1">
+      {statusIcons[status] || (
+        <Tooltip title="Message not delivered">
+          <CheckIcon className="text-gray-400" />
+        </Tooltip>
+      )} {/* Default single gray tick */}
+    </div>
+  );
+};
+
+    
+    
+    
+    
+    
+    
+    const renderMessageInput = () => (
+        <div
+          className="p-4 border-t border-gray-300 flex justify-center items-center"
+          style={{
+            position: 'sticky',
+            bottom: 0,
             zIndex: 10,
-            backgroundColor: '#f9fafb' // Light background color for a cleaner look
-        }}
-    >
-        <form 
-            onSubmit={handleSubmit} 
-            className='flex items-center w-full max-w-4xl' // Maximum width for larger screens
+            backgroundColor: '#f9fafb',
+          }}
         >
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center w-full max-w-4xl"
+            style={{
+              marginBottom: 'env(safe-area-inset-bottom)', // Prevent overlapping on iOS devices with bottom bars
+            }}
+          >
             <TextField
-                type="text"
-                size='small'
-                value={newMessage}
-                placeholder='Type a message...'
-                fullWidth
-                onChange={(e) => setNewMessage(e.target.value)}
-                InputProps={{
-                    style: {
-                        borderRadius: '25px', // More rounded corners for modern look
-                        padding: '10px 14px',
-                        backgroundColor: '#fff', // Keeping input background white
-                        border: '1px solid #ddd', // Subtle border for input
-                        fontSize: '16px', // Base font size
-                    },
-                }}
-                style={{
-                    flexGrow: 1, 
-                    marginRight: '10px' // Space between input and button
-                }}
+              type="text"
+              size="small"
+              value={newMessage}
+              placeholder="Type a message..."
+              fullWidth
+              onChange={(e) => setNewMessage(e.target.value)}
+              InputProps={{
+                style: {
+                  borderRadius: '25px', // More rounded corners
+                  marginBottom: '50px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ddd',
+                  fontSize: '16px',
+                },
+              }}
+              style={{
+                flexGrow: 1,
+                marginRight: '10px',
+              }}
             />
             <Button
-                type='submit'
-                variant='contained'
-                color='primary'
-                style={{
-                    borderRadius: '50%', // Circular button for a sleek design
-                    padding: '10px',
-                    minWidth: '50px',
-                    height: '50px',
-                    backgroundColor: '#00796b', // Consistent teal color
-                    color: 'white',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    boxShadow: '0 3px 6px rgba(0, 0, 0, 0.1)', // Soft shadow for elevation
-                    transition: 'background-color 0.3s ease', // Smooth hover effect
-                    zIndex: 10,
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005f56'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00796b'}
+              type="submit"
+              variant="contained"
+              color="primary"
+              style={{
+                borderRadius: '50%',
+                padding: '10px',
+                minWidth: '50px',
+                marginBottom: '50px',
+                height: '50px',
+                backgroundColor: '#00796b',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 3px 6px rgba(0, 0, 0, 0.1)',
+                transition: 'background-color 0.3s ease',
+                zIndex: 10,
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#005f56')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#00796b')}
             >
-                <SendIcon style={{ fontSize: '24px' }} />
+              <SendIcon style={{ fontSize: '24px' }} />
             </Button>
-        </form>
-    </div>
-);
-
+          </form>
+        </div>
+      );
+      
     
-    const renderSidebar = () => (
+      const renderSidebar = () => (
         <div
             className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform duration-500 ease-in-out z-10 sidebar ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             style={{
@@ -258,11 +340,15 @@ const ChatList = () => {
                 marginTop: "12vh",
                 maxWidth: '400px',
                 minWidth: '250px',
-                zIndex: 50
+                zIndex: 50,
             }}
         >
-            {/* <h1 className='text-gray-800 text-3xl font-bold mb-6 text-center drop-shadow-md'>Chats</h1> */}
-            <div className='overflow-y-auto h-[calc(100vh-12vh)]'>
+            <div 
+                className='overflow-y-auto h-[calc(100vh-12vh)] scrollbar-none' // Hides the scrollbar
+                style={{
+                    paddingBottom: '4rem', // Ensures space for the last user
+                }}
+            >
                 {list.length > 0 ? (
                     list.map((item) => (
                         <div
@@ -274,9 +360,16 @@ const ChatList = () => {
                             className={`flex items-center p-4 rounded-lg cursor-pointer mb-3 transition-all duration-200 ease-in-out hover:bg-gray-200 ${selectedConversation?._id === item._id ? 'bg-teal-500 text-white shadow-md' : 'bg-transparent text-gray-800'}`}
                         >
                             {item.ownerImg[0] ? (
-                                <img src={item.ownerImg[0]} alt="User" className='h-12 w-12 rounded-full object-cover border-2 border-teal-500 shadow-md' />
+                                <img
+                                    src={item.ownerImg[0]}
+                                    alt="User"
+                                    className='h-12 w-12 rounded-full object-cover border-2 border-teal-500 shadow-md'
+                                />
                             ) : (
-                                <AccountCircle color='inherit' style={{ fontSize: "48px", color: 'gray' }} />
+                                <AccountCircle
+                                    color='inherit'
+                                    style={{ fontSize: "48px", color: 'gray' }}
+                                />
                             )}
                             <div className='ml-4 overflow-hidden'>
                                 <h1 className='font-semibold text-lg text-gray-900 truncate'>{item.name}</h1>
@@ -290,6 +383,7 @@ const ChatList = () => {
             </div>
         </div>
     );
+    
     
     
     

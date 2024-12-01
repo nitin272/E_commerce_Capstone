@@ -246,18 +246,18 @@ const Products = () => {
                             <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                                 <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2, boxShadow: 3 }}>
                                 <CardMedia
-    component="img"
-    image={product.productImgUrls[0] || 'default-image-url'}
-    alt={product.productName}
-    sx={{
-        width: '100%', // Ensures the image fits the width of the card
-        height: 200, // Fixed height for uniformity
-        objectFit: 'contain', // Ensures the entire image is visible within the given space
-        borderTopLeftRadius: 2,
-        borderTopRightRadius: 2,
-        backgroundColor: '#f5f5f5', // Optional: Adds a background to handle images with transparency
-    }}
-/>
+                                        component="img"
+                                        image={product.productImgUrls[0] || 'default-image-url'}
+                                        alt={product.productName}
+                                        sx={{
+                                            width: '100%', // Ensures the image fits the width of the card
+                                            height: 200, // Fixed height for uniformity
+                                            objectFit: 'contain', // Ensures the entire image is visible within the given space
+                                            borderTopLeftRadius: 2,
+                                            borderTopRightRadius: 2,
+                                            backgroundColor: '#f5f5f5', // Optional: Adds a background to handle images with transparency
+                                        }}
+                                    />
 
                                     <CardContent sx={{ flexGrow: 1 }}>
                                         <Typography variant="h6" component="h2" color="primary">
@@ -335,7 +335,18 @@ const Products = () => {
                                 onChange={handleChange}
                                 fullWidth
                                 required
-                            />
+                                    />
+                                    <TextField
+                                margin="dense"
+                                label="Price"
+                                name="price"
+                                type="number"
+                                value={productData.price}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                    />
+                                    
                             <Button
                                 variant="outlined"
                                 component="label"
@@ -351,51 +362,45 @@ const Products = () => {
                                 />
                             </Button>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                                {imagePreviews.map((preview, index) => (
-                                    <Box
-                                        key={index}
-                                        sx={{
-                                            position: 'relative',
-                                            m: 1,
-                                            height: 150,
-                                            width: 200,
-                                            borderRadius: 2,
-                                            overflow: 'hidden',
-                                        }}
-                                    >
-                                        <img
-                                            src={preview}
-                                            alt="preview"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                        <IconButton
-                                            onClick={() => handleRemoveImage(index)}
-
-                                            sx={{
-
-                                                width: 40, // Increased width
-
-                                                height: 40, // Increased height for better touch target
-
-                                                position: 'absolute',
-
-                                                top: -5,
-
-                                                right: -5,
-
-                                                borderRadius: '50%', // Make it circular
-
-                                                '&:hover': {
-
-                                                    backgroundColor: 'Black', // Darker background on hover
-
-                                                },
-
-                                            }}
-                                        ><CloseIcon sx={{ fontSize: 34, fontWeight: 'bold', color: 'red' }} /> {/* Increased icon size and made it bold */}
-                                        </IconButton>
-
-                                    </Box>
+  {imagePreviews.map((preview, index) => (
+    <Box
+      key={index}
+      sx={{
+        position: 'relative',
+        m: 1,
+        height: 120,
+        width: "100",
+        borderRadius: 2,
+        overflow: 'hidden',
+        boxShadow: 1, // Optional: Add some shadow for better visuals
+      }}
+    >
+      <img
+        src={preview}
+        alt="preview"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+      <IconButton
+        onClick={() => handleRemoveImage(index)}
+        sx={{
+          position: 'absolute',
+          top: 5, // Adjusted closer to the top
+          right: 5, // Adjusted closer to the right
+          width: 30, // Optimized size for better aesthetics
+          height: 30,
+          backgroundColor: 'white', // Background color for visibility
+          color: 'red', // Icon color
+          boxShadow: 1, // Optional: Add shadow for a floating effect
+          '&:hover': {
+            backgroundColor: 'red', // Change color on hover
+            color: 'white', // Icon turns white
+          },
+        }}
+      >
+        <CloseIcon sx={{ fontSize: 22 }} />
+      </IconButton>
+    </Box>
+ 
                                 ))}
                             </Box>
                         </DialogContent>

@@ -1,13 +1,12 @@
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    senderId : {
+    senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
         required: true
     },
-    receiverId : {
+    receiverId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
         required: true
@@ -15,10 +14,19 @@ const messageSchema = new mongoose.Schema({
     message: {
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['sent', 'delivered', 'read'],
+        default: 'sent'  
+    },
+
+    isOnline:{
+        type: Boolean,
+        default: false
     }
-    //createdAt, updatedAt
-},{timestamps: true})
+}, { timestamps: true });  
 
-const Message = mongoose.model("message",messageSchema)
+const Message = mongoose.model("message", messageSchema);
 
-module.exports = {Message}
+module.exports = { Message };

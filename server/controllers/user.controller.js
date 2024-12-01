@@ -33,77 +33,94 @@ class User {
 
     // Login user
 
-    static Login = async (req, res) => {
-        try {
-            const { username, password } = req.body;
-    
-            const user = await userModel.findOne({ username });
-            if (!user) {
-                return res.status(401).send('Invalid username or password');
-            }
-    
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (!passwordMatch) {
-                return res.status(401).send('Invalid username or password');
-            }
-    
-            const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    
-            res.cookie('jwt', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                sameSite : "None"
-            });
-    
-            res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, username: user.username, role: user.role } });
-        } catch (error) {
-            res.status(500).send('Server Error');
-        }
-    }
-    
-
-
-
-  
-   // Register new user
-static PostUser = async (req, res) => {
+   // Login user
+static Login = async (req, res) => {
     try {
-        const { name, username, password, otp, validOtp } = req.body;
+        const { username, password, fcmToken } = req.body;
 
+        const user = await userModel.findOne({ username });
+        if (!user) {
+            return res.status(401).send('Invalid username or password');
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).send('Invalid username or password');
+        }
+
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        // Save FCM token to the user's database entry
+        if (fcmToken) {
+            if (!user.fcmTokens.includes(fcmToken)) {
+                user.fcmTokens.push(fcmToken);
+                await user.save();
+            }
+        }
+
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, username: user.username, role: user.role } });
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+}
+
+    
+   // Register new user
+   static PostUser = async (req, res) => {
+    try {
+        const { name, username, password, otp, validOtp, fcmToken } = req.body;
+
+        // Check if all required fields are present
         if (!(name && username && password && otp)) {
             return res.status(400).send('All input required');
         }
 
+        // Validate OTP
         if (validOtp === otp) {
             const existUser = await userModel.findOne({ username });
             if (existUser) {
                 return res.status(400).send("User Already Exist. Please Login");
             }
 
+            // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Create new user
             const newUser = await userModel.create({
                 name,
                 username,
-                password: hashedPassword
+                password: hashedPassword,
+                // Initialize fcmTokens with the provided token if it exists
+                fcmTokens: fcmToken ? [fcmToken] : [],
             });
 
+            // Generate JWT token
             const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+            // Set the cookie
             res.cookie('jwt', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                maxAge: 3600000
+                maxAge: 3600000,
             });
 
+            // Respond with success message and user info
             res.status(201).json({ message: 'User registered successfully', user: newUser });
         } else {
             res.status(400).send("Invalid OTP");
         }
     } catch (error) {
+        console.error(error); // Log the error for debugging
         res.status(500).send('Server Error');
     }
 }
+
 
     // Get all admins
     static GetAdmins = async (req, res) => {
@@ -175,6 +192,22 @@ static PostUser = async (req, res) => {
             res.json({ "user": findUser });
         } catch (error) {
             console.log(error);
+            res.status(500).send('Server Error');
+        }
+    }
+    // Get FCM Token for a specific user
+    static GetFCMToken = async (req, res) => {
+        try {
+            const userId = req.user.id; // Assume you're using middleware to set req.user with the authenticated user
+
+            const user = await userModel.findById(userId).select('fcmTokens');
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            res.json({ fcmTokens: user.fcmTokens });
+        } catch (error) {
+            console.error(error);
             res.status(500).send('Server Error');
         }
     }
