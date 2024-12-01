@@ -1,9 +1,6 @@
-// firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-
-// Initialize Firebase in the service worker
 const firebaseConfig = {
     apiKey: "AIzaSyDsHQT0fS_bEtYB0MAQVF4cyxG7mkI6YFM",
     authDomain: "scale-mart1.firebaseapp.com",
@@ -14,25 +11,50 @@ const firebaseConfig = {
     measurementId: "G-FC92258EGT"
 };
 
-// Initialize Firebase app
 firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 
-// Handle background messages
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
-    const notificationTitle = payload.notification.title || 'Notification'; // Default title if none
-    const notificationBody = payload.notification.body || 'You have a new message!'; // Default body if none
+    const notificationTitle = payload.notification.title || 'New Notification';
+    const notificationBody = payload.notification.body || 'You have a new update!';
+    const notificationIcon = '\src\assets\logo.png'; 
+    const notificationImage = payload.notification.image || '/images/default-image.jpg'; 
+    const actionUrl = payload.data.click_action || 'https://yourapp.com/chat'; 
+
+
     console.log(`[firebase-messaging-sw.js] Notification - Title: ${notificationTitle}, Body: ${notificationBody}`);
+
 
     const notificationOptions = {
         body: notificationBody,
-        icon: '/firebase-logo.png', // Ensure this icon is accessible
+        icon: notificationIcon, 
+        badge: '/images/badge-icon.png', 
+        image: notificationImage,
+        vibrate: [200, 100, 200],
+        data: {
+            click_action: actionUrl 
+        },
+        actions: [
+            {
+                action: 'view',
+                title: 'View Details',
+                icon: '/images/view-icon.png', 
+            },
+            {
+                action: 'dismiss',
+                title: 'Dismiss',
+                icon: '/images/dismiss-icon.png', 
+            }
+        ],
+        requireInteraction: true, 
+        renotify: true,
+        sound: '/sounds/notification-sound.mp3', 
     };
 
-    // Show notification to the user
+
     self.registration.showNotification(notificationTitle, notificationOptions)
         .then(() => {
             console.log('[firebase-messaging-sw.js] Notification displayed successfully');
@@ -40,4 +62,15 @@ messaging.onBackgroundMessage((payload) => {
         .catch((error) => {
             console.error('[firebase-messaging-sw.js] Error showing notification:', error);
         });
+});
+
+
+self.addEventListener('notificationclick', (event) => {
+    console.log('[firebase-messaging-sw.js] Notification clicked:', event.notification);
+
+    event.notification.close();
+
+    const actionUrl = event.notification.data.click_action;
+
+    clients.openWindow(actionUrl);
 });

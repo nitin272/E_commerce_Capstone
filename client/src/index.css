@@ -33,3 +33,12 @@
 .messages-container::-webkit-scrollbar {
     display: none; 
 }
+/* For webkit browsers (Chrome, Safari, Edge) */
+div::-webkit-scrollbar {
+    display: none; /* Hide the scrollbar */
+}
+
+/* For Firefox */
+div {
+    scrollbar-width: none; /* Hide the scrollbar */
+}

@@ -152,6 +152,8 @@ useEffect(() => {
                 style={{
                     backgroundImage: 'url("https://www.transparenttextures.com/patterns/white-wall.png")',
                     backgroundColor: '#f4f4f4',
+                    // Hide the default scrollbar while keeping scrolling enabled
+                    overflowY: 'scroll', // Allow vertical scrolling
                 }}
             >
                 {messages.length === 0 ? (
@@ -170,10 +172,9 @@ useEffect(() => {
                             >
                                 <div
                                     className={`relative p-3 rounded-lg max-w-[75%] shadow-md transition duration-300 ease-in-out
-                                        ${
-                                            message.senderId === user._id
-                                                ? 'bg-gradient-to-r from-teal-400 to-green-300 text-gray-900'
-                                                : 'bg-white border border-gray-200 text-gray-800'
+                                        ${message.senderId === user._id
+                                            ? 'bg-gradient-to-r from-teal-400 to-green-300 text-gray-900'
+                                            : 'bg-white border border-gray-200 text-gray-800'
                                         }`}
                                     style={{
                                         background: message.senderId === user._id
@@ -194,7 +195,6 @@ useEffect(() => {
                                         />
                                     )}
     
-                                 
                                     {message.senderId === user._id && (
                                         <div className="flex items-center justify-between text-xs mt-1">
                                             <p className="text-gray-500">{abstractTime(message.createdAt)}</p>
@@ -203,7 +203,6 @@ useEffect(() => {
                                     )}
                                 </div>
     
-                     
                                 {index === messages.length - 1 && <div ref={lastMessageRef} className="h-4" />}
                             </div>
                         ))}
@@ -212,6 +211,7 @@ useEffect(() => {
             </div>
         );
     };
+    
     
 
 const MessageStatusIndicator = ({ status }) => {
