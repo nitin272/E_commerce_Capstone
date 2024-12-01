@@ -1,8 +1,15 @@
 const admin = require('firebase-admin');
-const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG); // Parse the stringified JSON
+require('dotenv').config();
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+try {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+  
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} catch (error) {
+  console.error("Error parsing Firebase configuration: ", error);
+  process.exit(1); // Stop the app if the config is invalid
+}
 
 module.exports = admin;
