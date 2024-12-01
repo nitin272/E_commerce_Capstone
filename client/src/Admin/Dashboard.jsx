@@ -1,4 +1,3 @@
-// src/pages/AdminPanel.js
 
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -20,7 +19,7 @@ import Products from './ProductList';
 
 const AdminPanel = () => {
     const [selectedSection, setSelectedSection] = useState('users');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     const handleEditProduct = async (productId, updatedData) => {
         try {
@@ -37,10 +36,9 @@ const AdminPanel = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 12, minHeight: '100vh', pb: 8 }}>
-            {/* Navbar */}
+
             <Navbar />
 
-            {/* Admin Panel Header */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" fontWeight="bold" gutterBottom>
                     Admin Panel
@@ -52,7 +50,6 @@ const AdminPanel = () => {
 
             <Divider sx={{ mb: 4 }} />
 
-            {/* Tabs for Section Navigation */}
             <Paper
                 elevation={3}
                 sx={{
@@ -90,7 +87,6 @@ const AdminPanel = () => {
                 </Tabs>
             </Paper>
 
-            {/* Content Sections */}
             <Box sx={{ mt: 4 }}>
                 {selectedSection === 'users' && (
                     <Box sx={{ animation: 'fadeIn 0.5s ease-in-out' }}>
@@ -104,7 +100,6 @@ const AdminPanel = () => {
                 )}
             </Box>
 
-            {/* Footer */}
             <Footer />
         </Container>
     );

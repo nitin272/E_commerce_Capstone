@@ -13,14 +13,14 @@ import ChatList from './components/ChatList';
 import AdminDashboard from './Admin/Dashboard';
 import ProductDetail from './components/DetailProduct';
 import ContactPage from './components/Contact';
-import { requestPermission} from './Service/Firebase'; 
-import { Toaster, toast } from 'react-hot-toast'; 
+import { requestPermission } from './Service/Firebase'; 
+import { Toaster, toast } from 'react-hot-toast';
+import NotificationPermission from './hooks/NotificationPermission';
 
 function App() {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-
     const requestNotificationPermission = async () => {
       const permission = await requestPermission();
       if (permission) {
@@ -32,9 +32,13 @@ function App() {
 
     requestNotificationPermission();
   }, []);
-  
+
   return (
     <>
+
+
+
+      <NotificationPermission />
 
       <Routes>
         <Route path='/' element={<Home />} />
@@ -50,6 +54,9 @@ function App() {
         <Route path='/chat' element={<ChatList />} />
         <Route path='/dashboard' element={<AdminDashboard />} />
       </Routes>
+
+      {/* React Hot Toast */}
+      <Toaster />
     </>
   );
 }

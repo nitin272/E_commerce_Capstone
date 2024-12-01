@@ -14,7 +14,7 @@ const Profile = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useEffect(() => {
         const fetchUser = async () => {
