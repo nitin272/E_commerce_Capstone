@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; // Ensure this is the correct path for your logo
+import logo from '../assets/logo.png'; 
 
 import { Button, TextField, InputAdornment, IconButton } from '@mui/material/';
 import { Visibility, VisibilityOff, Google, PermIdentity, Lock, Token } from '@mui/icons-material';
@@ -22,7 +22,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -78,11 +78,10 @@ const Signup = () => {
   };
 
   const googleSignup = async () => {
-    // Request permission for notifications and get the token
+  
     const token = await requestPermission();
     console.log("token form frontend googel login",token);
   
-    // Redirect to Google OAuth with the FCM token as a query parameter
     window.open(`${apiUrl}/auth/google/callback?fcmToken=${token}`, "_self");
   };
   

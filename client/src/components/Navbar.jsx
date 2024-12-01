@@ -21,7 +21,7 @@ const Navbar = forwardRef(() => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isTablet = useMediaQuery('(max-width:960px)');
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const toggleDrawer = (open) => (event) => {
     if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -76,16 +76,16 @@ const Navbar = forwardRef(() => {
 
   const handleChatClick = () => {
     if (!userData || Object.keys(userData).length === 0) {
-      setDialogOpen(true); // Open dialog if not logged in
+      setDialogOpen(true);
     } else {
-      navigate('/chat'); // Navigate to chat if logged in
+      navigate('/chat'); 
     }
   };
 
-  // Close dialog
+
   const handleDialogClose = (action) => {
     setDialogOpen(false);
-    if (action === 'login') navigate('/login'); // Redirect to login if user selects "Login"
+    if (action === 'login') navigate('/login'); 
   };
   
   
@@ -96,8 +96,6 @@ const Navbar = forwardRef(() => {
   position="top-center" 
   reverseOrder={false} 
 />
-
-      {/* Top Navbar */}
       <div className='fixed top-0 left-0 right-0 flex justify-between items-center p-3 shadow-md w-full bg-white z-50'>
         <div className='flex items-center cursor-pointer'>
           <img src={logo} alt="logo" className={`h-12 object-cover mr-2 ${isTablet ? 'h-10' : 'h-16'}`} />
@@ -181,12 +179,10 @@ const Navbar = forwardRef(() => {
           </div>
         )}
 
-        {/* Mobile Dropdown */}
         {isMobile && (
   <div className="flex items-center space-x-2">
     <IconButton onClick={handleMenuOpen} aria-label="user menu">
       {Object.keys(userData).length > 0 ? (
-        // Render Avatar and the down-facing arrow when user is logged in
         <div className="flex items-center space-x-1">
           <Avatar alt="User Avatar" src={userData.ownerImg[0]} sx={{ width: 32, height: 32 }} />
           <ArrowDropDown fontSize="large" />
@@ -334,9 +330,6 @@ const Navbar = forwardRef(() => {
   </DialogActions>
 </Dialog>
 
-
-
-      {/* Bottom Navigation for Mobile */}
       {isMobile && (
   <BottomNavigation
     showLabels
@@ -349,12 +342,12 @@ const Navbar = forwardRef(() => {
       icon={<Home />}
       onClick={() => handleNavigate('/')}
       sx={{
-        color: '#1976D2', // Blue for home
+        color: '#1976D2', 
         '&.Mui-selected': {
-          color: '#1565C0', // Darker blue when selected
+          color: '#1565C0', 
         },
         '&:hover': {
-          color: '#1565C0', // Dark blue on hover
+          color: '#1565C0', 
         },
       }}
     />
@@ -363,12 +356,12 @@ const Navbar = forwardRef(() => {
       icon={<Chat />}
       onClick={handleChatClick}
       sx={{
-        color: '#4CAF50', // Green for chat
+        color: '#4CAF50', 
         '&.Mui-selected': {
-          color: '#388E3C', // Darker green when selected
+          color: '#388E3C', 
         },
         '&:hover': {
-          color: '#388E3C', // Dark green on hover
+          color: '#388E3C', 
         },
       }}
     />
@@ -377,12 +370,12 @@ const Navbar = forwardRef(() => {
       icon={<Category />}
       onClick={() => handleNavigate('/product')}
       sx={{
-        color: '#FF9800', // Orange for products
+        color: '#FF9800', 
         '&.Mui-selected': {
-          color: '#F57C00', // Darker orange when selected
+          color: '#F57C00', 
         },
         '&:hover': {
-          color: '#F57C00', // Dark orange on hover
+          color: '#F57C00', 
         },
       }}
     />
@@ -392,12 +385,12 @@ const Navbar = forwardRef(() => {
         icon={<Dashboard />}
         onClick={() => handleNavigate('/dashboard')}
         sx={{
-          color: '#9C27B0', // Purple for dashboard (admin)
+          color: '#9C27B0', 
           '&.Mui-selected': {
-            color: '#7B1FA2', // Darker purple when selected
+            color: '#7B1FA2', 
           },
           '&:hover': {
-            color: '#7B1FA2', // Dark purple on hover
+            color: '#7B1FA2', 
           },
         }}
       />

@@ -16,15 +16,13 @@ passport.use(new OAuth2Strategy({
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: "/auth/google/callback",
     scope: ["profile", "email"]
-}, async (accessToken, refreshToken, profile, done) => {
-    // console.log("OAuth2 Response: ", profile); // Log profile to see what data is being returned
-  
+},
+ async (accessToken, refreshToken, profile, done) => {
+
     try {
-        // Check if the user already exists
         let user = await userModel.findOne({ username: profile.emails[0].value });
 
         if (!user) {
-            // If user does not exist, create a new user
             user = await userModel.create({
                 name: profile.displayName,
                 username: profile.emails[0].value,
@@ -39,12 +37,10 @@ passport.use(new OAuth2Strategy({
     }
 }));
 
-// Serialize user for session
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-// Deserialize user from ID
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await userModel.findById(id);
@@ -54,7 +50,6 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// Google OAuth routes
 auth.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 auth.get('/auth/google/callback',
@@ -62,19 +57,14 @@ auth.get('/auth/google/callback',
   
     async (req, res) => {
         try {
-            // Generate JWT for the authenticated user
             const token = jwt.sign({ id: req.user._id, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-            // Set the JWT as an HTTP-only cookie
             res.cookie('jwt', token, {
-                httpOnly: true, // Prevents access via JavaScript
-                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', 
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 sameSite: "None"
             });
-
-            // Redirect to frontend (the cookie will be sent automatically)
-            res.redirect('http://localhost:4500/');
+            res.redirect('https://scale-mart1.vercel.app/');
 
         } catch (error) {
             console.error(error);
@@ -93,12 +83,9 @@ auth.post('/auth/fcm-token', authMiddleware, async (req, res) => {
     if (!fcmToken) {
         return res.status(400).json({ success: false, message: 'FCM token is required.' });
     }
-
     try {
-        // Access the authenticated user's ID
-        const userId = req.user.id; // Make sure authMiddleware sets req.user
 
-        // Save the FCM token to the user's record
+        const userId = req.user.id; 
         await userModel.findByIdAndUpdate(userId, { fcmTokens: fcmToken }, { new: true });
         console.log('FCM token saved for user:', userId);
         

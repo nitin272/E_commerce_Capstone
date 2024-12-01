@@ -1,4 +1,3 @@
-// Cloudinary.js
 
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -16,15 +15,15 @@ const uploadOnCloudinary = async (filePaths) => {
             const response = await cloudinary.uploader.upload(filePath, {
                 resource_type: "auto"
             });
-            fs.unlinkSync(filePath); // Remove local file after upload
-            return response.secure_url; // Return the secure URL from Cloudinary
+            fs.unlinkSync(filePath); 
+            return response.secure_url; 
         });
 
         const results = await Promise.all(promises);
-        return results; // Return array of secure URLs from Cloudinary
+        return results; 
     } catch (error) {
         filePaths.forEach(filePath => {
-            fs.unlinkSync(filePath); // Cleanup in case of error
+            fs.unlinkSync(filePath); 
         });
         throw error;
     }
@@ -32,7 +31,6 @@ const uploadOnCloudinary = async (filePaths) => {
 
 const deleteFromCloudinary = async (imageUrl) => {
     try {
-        // Extract the public ID from the URL
         const publicId = imageUrl.split('/').pop().split('.')[0];
         await cloudinary.uploader.destroy(publicId);
     } catch (error) {

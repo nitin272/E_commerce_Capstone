@@ -19,37 +19,38 @@ import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null); // State for current user
+  const [currentUser, setCurrentUser] = useState(null); 
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(''); // State for search term
-  const apiUrl = import.meta.env.VITE_APP_API_URL; // Ensure this URL is correct
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const apiUrl = "https://e-commerce-capstone.onrender.com"; 
   const navigate = useNavigate();
 
-  // Function to fetch current user
+
   const fetchCurrentUser = async () => {
     try {
       const response = await axios.get(`${apiUrl}/login/success`, { withCredentials: true });
-      setCurrentUser(response.data.user); // Set the user object directly
-    } catch (error) {
-      console.error('Error fetching current user:', error);
+      setCurrentUser(response.data.user); 
     }
+     finally {
+      
+    }
+    
   };
 
-  // Function to fetch users from the server
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${apiUrl}/users`, { withCredentials: true });
       setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
+    }
+     finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCurrentUser(); // Fetch the current user first
-    fetchUsers();       // Fetch the list of users
+    fetchCurrentUser(); 
+    fetchUsers();       
   }, []);
 
   if (loading) {
@@ -69,20 +70,20 @@ const Users = () => {
     );
   }
 
-  // Log the current user's ID for comparison
+ 
   const currentUserId = currentUser?._id;
 
-  // Filter out the current user from the users list
+
   const filteredUsers = users.filter(user => String(user._id) !== String(currentUserId));
 
-  // Further filter based on search term
+
   const searchedUsers = filteredUsers.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleStartChat = (userId, username) => {
-    // Pass both userId and username (email) to the chat component
+
     navigate('/chat', { state: { userId, username } });
   };
 
@@ -139,7 +140,7 @@ const Users = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleStartChat(user._id, user.username)} // Pass both userId and username
+                    onClick={() => handleStartChat(user._id, user.username)} 
                     sx={{
                       '&:hover': {
                         backgroundColor: 'darkblue',

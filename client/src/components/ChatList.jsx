@@ -13,12 +13,12 @@ import { AccountCircle, Menu as MenuIcon, Send as SendIcon } from '@mui/icons-ma
 import CheckIcon from '@mui/icons-material/Check';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Tooltip from '@mui/material/Tooltip';
-// import { useRef, useEffect } from 'react';
+
 
 
 const ChatList = () => {
     const [user, setUser] = useState({});
-    const [list, setList] = useState([]); // List of users for admin
+    const [list, setList] = useState([]); 
     const [newMessage, setNewMessage] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
@@ -28,21 +28,20 @@ const ChatList = () => {
     const { messages } = getMessages(user);
     const lastMessageRef = useRef();
     const { onlineUser } = useSocketContext();
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     useListenMessage();
 
     const { state } = location;
-    const initialUserId = state?.userId; // Get userId from location state
-    console.log('initialUserId:', initialUserId); // Log the initialUserId for debugging
-    // Inside your component
+    const initialUserId = state?.userId; 
 
-// Whenever the messages array updates (e.g., new message received)
+    
+
 useEffect(() => {
     if (lastMessageRef.current) {
         lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-}, [messages]); // This will trigger the effect when messages change
+}, [messages]); 
 
 
     useEffect(() => {
@@ -51,9 +50,9 @@ useEffect(() => {
                 const response = await axios.get(`${apiUrl}/login/success`, {
                     withCredentials: true,
                 });
-                setUser(response.data.user); // Set the logged-in user
+                setUser(response.data.user); 
             } catch (error) {
-                navigate('/error'); // Navigate to error page on failure
+                navigate('/error'); 
             }
         };
 
@@ -63,40 +62,36 @@ useEffect(() => {
                     'Content-Type': 'application/json',
                 };
 
-                // Admins can fetch the full list of users
                 if (user?.role === 'admin') {
                     const response = await axios.get(`${apiUrl}/users`, { headers, withCredentials: true });
                     const filteredList = response.data.filter(item => item._id !== user._id); // Exclude self from the list
                     setList(filteredList);
 
-                    // If an initialUserId exists, find and set the conversation
                     if (initialUserId) {
                         const conversation = filteredList.find(item => item._id === initialUserId);
                         if (conversation) {
-                            setSelectedConversation(conversation); // Set the selected conversation
+                            setSelectedConversation(conversation); 
                         }
                     }
                 } else {
-                    // Regular user logic: Fetch conversation based on initialUserId or hardcoded user ID
                     if (!initialUserId) {
-                        // Fetch hardcoded user ID for normal user if no initialUserId is provided
-                        const hardcodedUserId = '66b068ce8e6eb1b9d3ab587d'; // Replace with actual hardcoded ID
+                        const hardcodedUserId = '66b068ce8e6eb1b9d3ab587d'; 
                         const response = await axios.get(`${apiUrl}/user/${hardcodedUserId}`, { headers, withCredentials: true });
-                        setSelectedConversation(response.data); // Set self as the conversation
+                        setSelectedConversation(response.data); 
                     } else {
-                        // If an initialUserId exists for regular users, fetch the conversation directly
+                        
                         const response = await axios.get(`${apiUrl}/user/${initialUserId}`, { headers, withCredentials: true });
                         setSelectedConversation(response.data);
                     }
                 }
             } catch (error) {
-                console.error(error); // Log any errors
+                console.error(error); 
             }
         };
 
-        fetchUser(); // Fetch the user data
-        fetchList(); // Fetch the list of users and set the conversation
-    }, [user?.role, initialUserId, apiUrl, navigate]); // Dependencies for useEffect
+        fetchUser(); 
+        fetchList(); 
+    }, [user?.role, initialUserId, apiUrl, navigate]); 
 
 
     const handleSubmit = async (e) => {
@@ -115,21 +110,17 @@ useEffect(() => {
 
     const renderChatHeader = () => (
         <header className="flex items-center justify-between p-3 md:p-5 bg-white shadow-md border-b border-gray-200" style={{ marginTop: "12vh" }}>
-            
-            {/* Sidebar Toggle for Admins */}
             {user.role === 'admin' && (
                 <IconButton
                     onClick={() => setIsSidebarOpen(prev => !prev)}
                     className="text-gray-600 md:text-gray-700 hover:text-gray-800 transition duration-150 ease-in-out"
                 >
-                    <MenuIcon style={{ fontSize: "30px" }} /> {/* Reduced font size for better fit */}
+                    <MenuIcon style={{ fontSize: "30px" }} /> 
                 </IconButton>
             )}
-    
-            {/* If conversation is selected */}
             {selectedConversation ? (
                 <div className="flex items-center flex-grow">
-                    {/* User Avatar */}
+        
                     {selectedConversation.ownerImg?.[0] ? (
                         <img 
                             src={selectedConversation.ownerImg[0]} 
@@ -139,12 +130,9 @@ useEffect(() => {
                     ) : (
                         <AccountCircle style={{ fontSize: "48px", color: 'gray' }} />
                     )}
-                    
-                    {/* User Details */}
                     <div className="ml-5 overflow-hidden ">
                         <h1 className="text-lg font-semibold text-gray-800 truncate">{selectedConversation.name || 'Unknown'}</h1>
-                        {/* Uncomment the line below to show the username or email */}
-                        {/* <p className="text-sm text-gray-600 truncate">{selectedConversation.username || 'No email available'}</p> */}
+                        
                     </div>
                 </div>
             ) : (
@@ -155,7 +143,6 @@ useEffect(() => {
         </header>
     );
     
-    
     const renderMessages = () => {
         if (!selectedConversation) return null;
     
@@ -164,7 +151,7 @@ useEffect(() => {
                 className="flex-1 p-4 overflow-auto"
                 style={{
                     backgroundImage: 'url("https://www.transparenttextures.com/patterns/white-wall.png")',
-                    backgroundColor: '#f4f4f4', // Light neutral background for better contrast
+                    backgroundColor: '#f4f4f4',
                 }}
             >
                 {messages.length === 0 ? (
@@ -207,7 +194,7 @@ useEffect(() => {
                                         />
                                     )}
     
-                                    {/* Message Status and Timestamp Indicators */}
+                                 
                                     {message.senderId === user._id && (
                                         <div className="flex items-center justify-between text-xs mt-1">
                                             <p className="text-gray-500">{abstractTime(message.createdAt)}</p>
@@ -216,7 +203,7 @@ useEffect(() => {
                                     )}
                                 </div>
     
-                                {/* Space for the last message */}
+                     
                                 {index === messages.length - 1 && <div ref={lastMessageRef} className="h-4" />}
                             </div>
                         ))}
@@ -226,8 +213,6 @@ useEffect(() => {
         );
     };
     
-    
-
 
 const MessageStatusIndicator = ({ status }) => {
   const statusIcons = {
@@ -235,17 +220,17 @@ const MessageStatusIndicator = ({ status }) => {
       <Tooltip title="Message not delivered">
         <CheckIcon className="text-gray-400" />
       </Tooltip>
-    ), // Single gray tick for offline (not delivered)
+    ), 
     delivered: (
       <Tooltip title="Message delivered">
         <DoneAllIcon className="text-gray-400" />
       </Tooltip>
-    ), // Double gray ticks for delivered but not read
+    ), 
     read: (
       <Tooltip title="Message read">
         <DoneAllIcon className="text-blue-500 animate-pulse" />
       </Tooltip>
-    ), // Double blue ticks with animation for read
+    ), 
   };
 
   return (
@@ -254,7 +239,7 @@ const MessageStatusIndicator = ({ status }) => {
         <Tooltip title="Message not delivered">
           <CheckIcon className="text-gray-400" />
         </Tooltip>
-      )} {/* Default single gray tick */}
+      )} 
     </div>
   );
 };

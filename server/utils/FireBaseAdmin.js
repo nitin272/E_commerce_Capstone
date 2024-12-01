@@ -9,7 +9,7 @@ try {
   });
 } catch (error) {
   console.error("Error parsing Firebase configuration: ", error);
-  process.exit(1); // Stop the app if the config is invalid
+  process.exit(1);
 }
 
 module.exports = admin;

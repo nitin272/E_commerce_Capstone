@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    // Get token from cookies
+
     const token = req.cookies.jwt;
 
     if (!token) {
@@ -10,8 +10,7 @@ const authMiddleware = (req, res, next) => {
 
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified; // Store the user info in req.user
-        // console.log("verified user", verified);
+        req.user = verified;
         next();
     } catch (error) {
         res.status(400).send('Invalid token.');

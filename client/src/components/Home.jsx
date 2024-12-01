@@ -9,15 +9,17 @@ import { Login as LoginIcon } from '@mui/icons-material';
 import Logo from '../assets/supermarket.jpg';
 
 const Home = () => {
-  const [userName, setUserName] = useState('Guest'); // Default to 'Guest'
+  const [userName, setUserName] = useState('Guest');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
-  const [dialogOpen, setDialogOpen] = useState(false); // Track dialog state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [dialogOpen, setDialogOpen] = useState(false); 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAll, setShowAll] = useState(false);
+
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const bgImages = [
     {
@@ -29,10 +31,10 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/products'); // Replace with your API endpoint
+        const response = await axios.get('http://localhost:4000/products'); 
         const products = response.data;
         setProducts(products);
-        setFilteredProducts(products); // Initially, show all products
+        setFilteredProducts(products); 
         const uniqueCategories = ['All', ...new Set(products.map((product) => product.category))];
         setCategories(uniqueCategories);
       } catch (error) {
@@ -42,12 +44,12 @@ const Home = () => {
 
     const fetchUserName = async () => {
       try {
-        const user = await axios.get('http://localhost:4000/login/success', { withCredentials: true }); // Replace with your API endpoint
+        const user = await axios.get(`${apiUrl}/login/success`, { withCredentials: true }); 
         setUserName(user.data.user.name);
-        setIsLoggedIn(true); // Set logged-in state
+        setIsLoggedIn(true); 
       } catch (error) {
         console.error('Error fetching user:', error);
-        setIsLoggedIn(false); // Set logged-out state
+        setIsLoggedIn(false); 
       }
     };
 
@@ -66,19 +68,19 @@ const Home = () => {
   };
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:4500/login';
+    window.location.href = 'https://scale-mart1.vercel.app/login';
   };
 
   const handleProductClick = (product) => {
     if (isLoggedIn) {
-      window.location.href = `http://localhost:4500/products/${product._id}`;
+      window.location.href = `${apiUrl}/products/${product._id}`;
     } else {
-      setDialogOpen(true); // Open dialog if not logged in
+      setDialogOpen(true); 
     }
   };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false); // Close dialog
+    setDialogOpen(false); 
   };
   const displayedCategories = showAll ? categories : categories.slice(0, 6);
 
@@ -89,15 +91,14 @@ const Home = () => {
     <div className="overflow-hidden" style={{ marginTop: '12vh' }}>
       <Navbar option="" />
 
-      {/* User Greeting */}
+
       <div className="bg-gray-100 py-4 text-center">
         <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-blue-600">
           Hi {userName}, Welcome Back!
         </h1>
       </div>
 
-      {/* Hero Section */}
-      <div
+     <div
         style={{
           backgroundImage: `url(${bgImages[0].img})`,
           backgroundSize: 'cover',
@@ -127,7 +128,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Category Section */}
+
       <div className="bg-white py-12">
         <div className="w-full md:w-4/5 lg:w-3/5 mx-auto">
           <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">
@@ -137,7 +138,7 @@ const Home = () => {
             Find the right product for your needs from our wide selection of categories.
           </p>
 
-       {/* Category Buttons */}
+
        <div className="pb-4">
       <div className="flex flex-wrap justify-start gap-4">
         {displayedCategories.map((category, index) => (
@@ -152,7 +153,7 @@ const Home = () => {
           </button>
         ))}
       </div>
-      {/* Show More/Show Less Button */}
+
       {categories.length > 6 && (
         <div className="mt-4">
           <button
@@ -167,7 +168,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Log In Button (Only if not logged in) */}
+
       {!isLoggedIn && (
         <div className="text-center mt-10">
           <button
@@ -180,7 +181,7 @@ const Home = () => {
       )}
 
       
-      {/* Featured Products */}
+
       <div className="w-full md:w-11/12 lg:w-10/12 mx-auto py-8 px-4 bg-gray-50 bg-[black],">
         <h2 className="text-3xl md:text-4xl font-extrabold text-blue-900 text-center mb-10">
           {selectedCategory === 'All' ? 'Featured Products' : `Products in ${selectedCategory}`}
@@ -226,7 +227,7 @@ const Home = () => {
 
       <Footer />
 
-      {/* Dialog for non-logged in users */}
+
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
   <DialogTitle sx={{ fontWeight: 600, textAlign: 'center', color: '#333', paddingBottom: '10px' }}>

@@ -6,36 +6,30 @@
     display: none;
 }
 .scrollbar-none {
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
-
-/* Hide the default scrollbar */
 .messages-container {
-    overflow: hidden; /* Prevent scrollbars */
+    overflow: hidden;
 }
 
-/* For Webkit browsers like Chrome and Safari */
 .messages-container::-webkit-scrollbar {
     display: none;
 }
 
-/* For Firefox */
 .messages-container {
-    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    scrollbar-width: none;
 }
 
-/* For Internet Explorer and Edge */
 .messages-container {
-    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+    -ms-overflow-style: none;
 }
 
-/* If you want to enable scrolling for the content but not show a scrollbar */
 .messages-container {
-    overflow-y: scroll; /* Allow vertical scrolling */
-    scrollbar-width: none; /* Firefox */
+    overflow-y: scroll; 
+    scrollbar-width: none;
 }
 
 .messages-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none; 
 }

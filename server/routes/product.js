@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/product.controller'); // Adjust the path if needed
-const upload = require('../middleware/Files.middleware'); // Adjust the path if needed
+const productController = require('../controllers/product.controller'); 
+const upload = require('../middleware/Files.middleware');
 const { User } = require('../controllers/user.controller');
 const { authMiddleware } = require('../middleware/TokenVerify.middleware');
 const isAdmin = require('../middleware/IsAdmin.middleware');

@@ -16,13 +16,12 @@ const Profile = () => {
     const navigate = useNavigate();
     const apiUrl = import.meta.env.VITE_APP_API_URL;
 
-    // Fetch user data
     useEffect(() => {
         const fetchUser = async () => {
             setLoading(true);
             try {
                 const userResponse = await axios.get(`${apiUrl}/login/success`, {
-                    withCredentials: true,  // Send cookies with request
+                    withCredentials: true,  
                 });
                 const userData = userResponse.data.user;
                 setUserData(userData);
@@ -37,17 +36,14 @@ const Profile = () => {
         fetchUser();
     }, [navigate, apiUrl]);
 
-    // Handle Edit button click
     const handleEdit = () => {
         setIsEditing(true);
     };
 
-    // Handle form submission for updating profile
     const handleUpdate = async (e) => {
         e.preventDefault();
         const contact = userData.contact || '';
 
-        // Validate contact number if provided
         if (contact.length === 0 || contact.length === 10) {
             try {
                 const formData = new FormData();
@@ -55,16 +51,14 @@ const Profile = () => {
                 formData.append('contact', contact);
                 formData.append('address', userData.address || '');
 
-                // Append image only if there's a new one
                 if (userData.ownerImg) {
                     formData.append('ownerImg', userData.ownerImg);
                 }
 
                 setLoading(true);
-                // Update profile
                 await axios.put(`${apiUrl}/update/${userData._id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
-                    withCredentials: true,  // Ensure cookies are sent
+                    withCredentials: true, 
                 });
                 setSuccess("Profile updated successfully");
                 setIsEditing(false);
@@ -79,7 +73,6 @@ const Profile = () => {
         }
     };
 
-    // Timeout for alert messages
     useEffect(() => {
         if (alert) {
             const timer = setTimeout(() => setAlert(''), 3000);
@@ -87,7 +80,6 @@ const Profile = () => {
         }
     }, [alert]);
 
-    // Timeout for success messages and redirection after update
     useEffect(() => {
         if (success) {
             const timer = setTimeout(() => {
@@ -98,7 +90,7 @@ const Profile = () => {
         }
     }, [success, navigate]);
 
-    // Handle input changes for form fields and file input
+
     const handleChange = (e) => {
         if (e.target.name === 'ownerImg') {
             const file = e.target.files[0];

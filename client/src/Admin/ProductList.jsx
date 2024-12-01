@@ -20,7 +20,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SearchFilter from '../components/Search'; // Ensure this file contains the search filter component
+import SearchFilter from '../components/Search'; 
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -40,13 +40,13 @@ const Products = () => {
     const [currentProduct, setCurrentProduct] = useState(null);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
             const response = await axios.get(`${apiUrl}/products`, {
-                withCredentials: true // Include credentials in the request
+                withCredentials: true 
             });
             setProducts(response.data);
 
@@ -103,9 +103,9 @@ const Products = () => {
     const handleDeleteProduct = async (productId) => {
         setLoading(true);
         try {
-            // Corrected URL with a leading slash before the productId
+        
             await axios.delete(`${apiUrl}/products/${productId}`, {
-                withCredentials: true // Include credentials in the request
+                withCredentials: true
             });
             toast.success('Product deleted successfully.');
             fetchProducts();
@@ -250,12 +250,12 @@ const Products = () => {
                                         image={product.productImgUrls[0] || 'default-image-url'}
                                         alt={product.productName}
                                         sx={{
-                                            width: '100%', // Ensures the image fits the width of the card
-                                            height: 200, // Fixed height for uniformity
-                                            objectFit: 'contain', // Ensures the entire image is visible within the given space
+                                            width: '100%', 
+                                            height: 200, 
+                                            objectFit: 'contain', 
                                             borderTopLeftRadius: 2,
                                             borderTopRightRadius: 2,
-                                            backgroundColor: '#f5f5f5', // Optional: Adds a background to handle images with transparency
+                                            backgroundColor: '#f5f5f5', 
                                         }}
                                     />
 
@@ -372,7 +372,7 @@ const Products = () => {
         width: "100",
         borderRadius: 2,
         overflow: 'hidden',
-        boxShadow: 1, // Optional: Add some shadow for better visuals
+        boxShadow: 1, 
       }}
     >
       <img
@@ -384,16 +384,16 @@ const Products = () => {
         onClick={() => handleRemoveImage(index)}
         sx={{
           position: 'absolute',
-          top: 5, // Adjusted closer to the top
-          right: 5, // Adjusted closer to the right
-          width: 30, // Optimized size for better aesthetics
+          top: 5, 
+          right: 5, 
+          width: 30, 
           height: 30,
-          backgroundColor: 'white', // Background color for visibility
-          color: 'red', // Icon color
-          boxShadow: 1, // Optional: Add shadow for a floating effect
+          backgroundColor: 'white', 
+          color: 'red', 
+          boxShadow: 1, 
           '&:hover': {
-            backgroundColor: 'red', // Change color on hover
-            color: 'white', // Icon turns white
+            backgroundColor: 'red', 
+            color: 'white', 
           },
         }}
       >

@@ -12,7 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = 'https://e-commerce-capstone.onrender.com';
 
   const onLoginBtn = async (e) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ const Login = () => {
 
       const token = await requestPermission();
 
-      // Send login request to backend with credentials
+
       const response = await axios.post(`${apiUrl}/login`, {
         username: email,
         password,
@@ -33,25 +33,24 @@ const Login = () => {
       }
 
       toast.success('Login successful');
-      navigate('/'); // Redirect to home page
+      navigate('/'); 
     } catch (error) {
       toast.error(error.response?.data || 'Login failed');
     }
   };
 
-  // Check for valid token on component mount
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          // Check token validity
+
           const response = await axios.get(`${apiUrl}/login/success`, {
             headers: { 'Authorization': `Bearer ${token}` },
             withCredentials: true,
           });
           if (response.data.user) {
-            navigate('/'); // Redirect if authenticated
+            navigate('/');
           }
         } catch (error) {
           console.log('Error validating token', error);
@@ -65,9 +64,9 @@ const Login = () => {
     try {
       const fcmToken = await requestPermission();
       if (fcmToken) {
-        // Optionally send the FCM token to your server
+
         const url = `${apiUrl}/auth/google`;
-        window.open(url, "_self"); // Redirect to Google auth page
+        window.open(url, "_self"); 
    
       }
       

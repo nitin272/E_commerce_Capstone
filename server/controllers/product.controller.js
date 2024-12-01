@@ -34,7 +34,7 @@ exports.createProduct = async (req, res) => {
 
         const product = new Product({
             ...req.body,
-            productImgUrls: imageUrls // Use productImgUrls field
+            productImgUrls: imageUrls 
         });
 
         const newProduct = await product.save();

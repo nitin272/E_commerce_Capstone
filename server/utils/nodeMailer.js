@@ -13,13 +13,12 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Forget password mail
 const ForgetPasswordMail = (user, token) => {
     const mailOptions = {
         from: process.env.EMAIL,
         to: user.username,
         subject: 'Reset your password',
-        text: `Click on this link to reset your password: http://localhost:4500/resetPassword/${user._id}/${token}`
+        text: `Click on this link to reset your password: https://scale-mart1.vercel.app/resetPassword/${user._id}/${token}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -31,7 +30,6 @@ const ForgetPasswordMail = (user, token) => {
     });
 };
 
-// OTP generator
 const generatedOtp = () => {
     const otp = otpGenerator.generate(6, {
         lowerCaseAlphabets: false,
