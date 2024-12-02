@@ -22,7 +22,7 @@ messaging.onBackgroundMessage((payload) => {
     const notificationBody = payload.notification.body || 'You have a new update!';
     const notificationIcon = '\src\assets\logo.png'; 
     const notificationImage = payload.notification.image || '/images/default-image.jpg'; 
-    const actionUrl = payload.data.click_action || 'https://yourapp.com/chat'; 
+    const actionUrl = payload.data.click_action || 'https://scale-mart1.vercel.app/chat'; 
 
 
     console.log(`[firebase-messaging-sw.js] Notification - Title: ${notificationTitle}, Body: ${notificationBody}`);

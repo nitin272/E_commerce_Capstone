@@ -46,7 +46,7 @@ export const requestPermission = async () => {
       console.log('Notification permission was denied.');
     }
   } catch (error) {
-    console.error('Error getting FCM token:', error);
+    // console.error('Error getting FCM token:', error);
   }
 };
 
@@ -55,6 +55,6 @@ export const saveFcmToken = async (token) => {
     const response = await axios.post(`${apiUrl}/auth/fcm-token`, { fcmToken: token }, { withCredentials: true });
     console.log('FCM token saved:', response.data);
   } catch (error) {
-    console.error('Error saving FCM token:', error);
+    // console.error('Error saving FCM token:', error);
   }
 };

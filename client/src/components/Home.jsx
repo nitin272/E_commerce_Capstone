@@ -73,7 +73,7 @@ const Home = () => {
 
   const handleProductClick = (product) => {
     if (isLoggedIn) {
-      window.location.href = `${apiUrl}/products/${product._id}`;
+      window.location.href = `https://scale-mart1.vercel.app/products/${product._id}`;
     } else {
       setDialogOpen(true); 
     }
