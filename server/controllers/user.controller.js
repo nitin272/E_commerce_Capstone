@@ -53,10 +53,12 @@ static Login = async (req, res) => {
         }
 
         res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+    httpOnly: true,                 // Prevent client-side JS access for security
+    secure: true,                   // Ensure cookies are sent over HTTPS
+    sameSite: 'None',               // Allow cross-site cookie usage
+    maxAge: 7 * 24 * 60 * 60 * 1000 // Cookie expiration time
+});
+
 
         res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, username: user.username, role: user.role } });
     } catch (error) {
