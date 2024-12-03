@@ -6,6 +6,7 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const { ForgetPasswordMail, otpSignUp, generatedOtp } = require('../utils/nodeMailer');
 
+
 class User {
 
     static GetUser = async (req, res) => {
