@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, unique: true, required: true },
     contact: String,
     address: String,
-    password: { type: String, required: true },
+    password: { type: String},
     ownerImg: [String],
     role: { type: String, default: 'user' },
     fcmTokens: { type: [String]}, 
