@@ -12,26 +12,16 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const apiUrl = 'https://e-commerce-capstone.onrender.com';
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
   const onLoginBtn = async (e) => {
     e.preventDefault();
     try {
 
-      const token = await requestPermission();
-
-
       const response = await axios.post(`${apiUrl}/login`, {
         username: email,
         password,
       }, { withCredentials: true });
-
-
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        await saveFcmToken(token); 
-      }
-
       toast.success('Login successful');
       navigate('/'); 
     } catch (error) {
@@ -41,12 +31,9 @@ const Login = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
+  
         try {
-
-          const response = await axios.get(`${apiUrl}/login/success`, {
-            headers: { 'Authorization': `Bearer ${token}` },
+        const response = await axios.get(`${apiUrl}/login/success`, {
             withCredentials: true,
           });
           if (response.data.user) {
@@ -54,7 +41,7 @@ const Login = () => {
           }
         } catch (error) {
           console.log('Error validating token', error);
-        }
+      
       }
     };
     checkAuth();
@@ -62,14 +49,8 @@ const Login = () => {
 
   const googlePage = async () => {
     try {
-      const fcmToken = await requestPermission();
-      if (fcmToken) {
-
         const url = `${apiUrl}/auth/google`;
         window.open(url, "_self"); 
-   
-      }
-      
     } catch (error) {
       console.error('Error opening Google auth page:', error);
       toast.error('Google authentication failed.');
