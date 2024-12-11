@@ -1,17 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Box, Typography, Paper } from '@mui/material';
 
 const NotificationPermission = () => {
   const [permission, setPermission] = useState(Notification.permission);
 
   const requestNotificationPermission = () => {
-    Notification.requestPermission().then((permission) => {
-      setPermission(permission);
-      if (permission === 'granted') {
+    Notification.requestPermission().then((newPermission) => {
+      setPermission(newPermission);
+      if (newPermission === 'granted') {
         console.log('Notifications enabled');
       }
     });
   };
+
+  useEffect(() => {
+    // Update state if Notification permission changes during runtime
+    const handlePermissionChange = () => {
+      setPermission(Notification.permission);
+    };
+
+    window.addEventListener('focus', handlePermissionChange);
+    return () => {
+      window.removeEventListener('focus', handlePermissionChange);
+    };
+  }, []);
 
   return (
     permission === 'default' && (
