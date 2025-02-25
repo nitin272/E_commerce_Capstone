@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: false }, 
     ownerImg: [String],
     role: { type: String, default: 'user' },
-    fcmTokens: {[String]}, 
+    fcmTokens: {type: [String]}, 
     IsOnline: { type: Boolean, default: false },
 }, { timestamps: true });
 
