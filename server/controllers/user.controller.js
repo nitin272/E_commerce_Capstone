@@ -154,20 +154,38 @@ static Login = async (req, res) => {
     static PutUser = async (req, res) => {
         try {
             const id = req.params.id;
-            const modifiedData = req.body;
+            const { name, contact, address } = req.body;
             const files = req.files;
 
+            // Create update object with all fields
+            const updateData = {
+                name: name || '',
+                contact: contact || '',
+                address: address || ''
+            };
+
+            // Handle image upload if present
             if (files && files.length > 0) {
                 const filePaths = files.map(file => file.path);
                 const urls = await uploadOnCloudinary(filePaths);
-                modifiedData.ownerImg = urls;
+                updateData.ownerImg = urls;
             }
 
-            const updatedData = await userModel.findByIdAndUpdate(id, modifiedData, { new: true });
-            res.json(updatedData);
+            // Update user with new data
+            const updatedUser = await userModel.findByIdAndUpdate(
+                id,
+                updateData,
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            res.json(updatedUser);
         } catch (error) {
-            console.log(error);
-            res.status(500).send("Server Error");
+            console.error('Update error:', error);
+            res.status(500).json({ message: "Server Error", error: error.message });
         }
     }
 

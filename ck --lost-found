@@ -1,0 +1,54 @@
+[33ma5481b6[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdeploy[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33ma5481b6[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdeploy[m[33m)[m HEAD@{1}: checkout: moving from Refine-F to main
+[33m3384f91[m HEAD@{2}: reset: moving to HEAD
+[33m3384f91[m HEAD@{3}: pull: Merge made by the 'ort' strategy.
+[33m18de6c8[m HEAD@{4}: commit: frontend errors solved
+[33m086d47f[m HEAD@{5}: commit: forntend refined
+[33ma5481b6[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdeploy[m[33m)[m HEAD@{6}: checkout: moving from deploy to Refine-F
+[33ma5481b6[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdeploy[m[33m)[m HEAD@{7}: pull origin main: Fast-forward
+[33m39a95dc[m[33m ([m[1;31morigin/Deploy[m[33m)[m HEAD@{8}: reset: moving to HEAD
+[33m39a95dc[m[33m ([m[1;31morigin/Deploy[m[33m)[m HEAD@{9}: checkout: moving from main to deploy
+[33ma5481b6[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdeploy[m[33m)[m HEAD@{10}: commit: allow permision updated
+[33m3715429[m HEAD@{11}: pull: Fast-forward
+[33ma47d304[m HEAD@{12}: reset: moving to HEAD
+[33ma47d304[m HEAD@{13}: commit: cloud messeging
+[33mf07b168[m HEAD@{14}: pull: Fast-forward
+[33m2e56a3d[m HEAD@{15}: commit: notification alert
+[33m8ccfeb3[m HEAD@{16}: commit: notification alert
+[33m993902b[m HEAD@{17}: commit: updated the Urls
+[33m0cf72f8[m HEAD@{18}: pull: Fast-forward
+[33m45382f0[m HEAD@{19}: checkout: moving from Chat-UI to main
+[33m7707d25[m[33m ([m[1;32mChat-UI[m[33m)[m HEAD@{20}: commit: updated the Urls
+[33mab7687f[m HEAD@{21}: pull: Merge made by the 'ort' strategy.
+[33m088def9[m HEAD@{22}: commit: updated the Urls
+[33mce7194e[m HEAD@{23}: pull origin Chat-UI: Merge made by the 'ort' strategy.
+[33mfef8ff7[m HEAD@{24}: commit: updated the Urls
+[33m8b757b0[m HEAD@{25}: commit: Add Firebase credentials file to .gitignore
+[33mb699b6d[m HEAD@{26}: commit (amend): improved UI and Integrated Firebase
+[33m6f3fda2[m HEAD@{27}: checkout: moving from main to Chat-UI
+[33m45382f0[m HEAD@{28}: checkout: moving from Chat-UI to main
+[33m6f3fda2[m HEAD@{29}: commit: improved UI and Integrated Firebase
+[33m45382f0[m HEAD@{30}: checkout: moving from main to Chat-UI
+[33m45382f0[m HEAD@{31}: reset: moving to HEAD
+[33m45382f0[m HEAD@{32}: pull: Fast-forward
+[33m188fac9[m HEAD@{33}: checkout: moving from Deploy to main
+[33m39a95dc[m[33m ([m[1;31morigin/Deploy[m[33m)[m HEAD@{34}: reset: moving to HEAD
+[33m39a95dc[m[33m ([m[1;31morigin/Deploy[m[33m)[m HEAD@{35}: commit: CORS handle in socket
+[33m48d62d3[m HEAD@{36}: checkout: moving from Reponsive to Deploy
+[33m4871cee[m[33m ([m[1;31morigin/Reponsive[m[33m, [m[1;32mReponsive[m[33m)[m HEAD@{37}: commit: dist
+[33ma5e208e[m HEAD@{38}: commit: deployement
+[33mc102023[m HEAD@{39}: pull: Merge made by the 'ort' strategy.
+[33m47c408a[m HEAD@{40}: commit: vercel.json added
+[33m8e7e583[m HEAD@{41}: commit: made all pages responsive
+[33mb4a4673[m[33m ([m[1;31morigin/backendApiImpl[m[33m, [m[1;32mbackendApiImpl[m[33m)[m HEAD@{42}: checkout: moving from backendApiImpl to Reponsive
+[33mb4a4673[m[33m ([m[1;31morigin/backendApiImpl[m[33m, [m[1;32mbackendApiImpl[m[33m)[m HEAD@{43}: commit: api changed
+[33m48d62d3[m HEAD@{44}: checkout: moving from Deploy to backendApiImpl
+[33m48d62d3[m HEAD@{45}: commit: dist
+[33m3e2d2d7[m HEAD@{46}: commit: dist add
+[33mf025dca[m HEAD@{47}: commit: dist created
+[33m7cbfa07[m HEAD@{48}: commit: changes addedd to github
+[33m188fac9[m HEAD@{49}: checkout: moving from main to Deploy
+[33m188fac9[m HEAD@{50}: pull: Fast-forward
+[33m506519c[m HEAD@{51}: reset: moving to HEAD
+[33m506519c[m HEAD@{52}: commit: File pushed
+[33mebf70a1[m HEAD@{53}: clone: from https://github.com/nitin272/E_commerce_Capstone.git

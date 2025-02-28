@@ -1,20 +1,26 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client'
 import axios from "axios";
 import useConversation from '../Zustand/getConversation'
-export const SocketContext = createContext()
+
+const SocketContext = createContext()
 
 export const useSocketContext = () => {
-  return useContext(SocketContext)
+  const context = useContext(SocketContext)
+  if (!context) {
+    throw new Error('useSocketContext must be used within a SocketContextProvider')
+  }
+  return context
 }
+
 export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null)
   const [run, setRun] = useState(false)
-  const [onlineUser, setOnlineUser] = useState([])
+  const [onlineUsers, setOnlineUsers] = useState([])
   const [user, setUser] = useState(null)
   const {selectedConversation,conversation_Id } = useConversation()
 
-  const apiUrl = "https://e-commerce-capstone.onrender.com"
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
   const fetchUser = async () => {
     try {
       const id = localStorage.getItem('id')
@@ -45,7 +51,7 @@ export const SocketContextProvider = ({ children }) => {
       })
       setRun(true)
       socket.on('getOnlineUSer', (users) => {
-        setOnlineUser(users)
+        setOnlineUsers(users)
       })
 
       setSocket(socket)
@@ -53,10 +59,24 @@ export const SocketContextProvider = ({ children }) => {
       return () => socket.close()
     } else {
       setSocket(null)
-      setOnlineUser([])
+      setOnlineUsers([])
 
     }
 
   }, [user,run,selectedConversation,conversation_Id])
-  return <SocketContext.Provider value={{ socket, onlineUser }}>{children}</SocketContext.Provider>
+
+  useEffect(() => {
+    const newSocket = io(import.meta.env.VITE_APP_API_URL);
+    setSocket(newSocket);
+
+    newSocket.on("getOnlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      if (newSocket) newSocket.close();
+    };
+  }, []);
+
+  return <SocketContext.Provider value={{ socket, onlineUsers }}>{children}</SocketContext.Provider>
 }

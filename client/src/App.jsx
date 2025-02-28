@@ -16,6 +16,9 @@ import ContactPage from './components/Contact';
 import { requestPermission } from './Service/Firebase'; 
 import { Toaster, toast } from 'react-hot-toast';
 import NotificationPermission from './hooks/NotificationPermission';
+// import FCMNotification from './components/FCMNotification';
+import { SocketContextProvider } from './socket/Socket';
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,12 +37,9 @@ function App() {
   }, []);
 
   return (
-    <>
+    <SocketContextProvider>
       <NotificationPermission />
-
-
-
-      <NotificationPermission />
+      {/* <FCMNotification /> */}
 
       <Routes>
         <Route path='/' element={<Home />} />
@@ -49,7 +49,7 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/error' element={<Error />} />
         <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path='/forgetPassword' element={<ForgetPassword />} />
+        <Route path='/forgot-Password' element={<ForgetPassword />} />
         <Route path='/resetPassword/:id/:token' element={<ResetPassword />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/chat' element={<ChatList />} />
@@ -58,7 +58,7 @@ function App() {
 
       {/* React Hot Toast */}
       <Toaster />
-    </>
+    </SocketContextProvider>
   );
 }
 

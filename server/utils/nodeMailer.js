@@ -18,7 +18,7 @@ const ForgetPasswordMail = (user, token) => {
         from: process.env.EMAIL,
         to: user.username,
         subject: 'Reset your password',
-        text: `Click on this link to reset your password: https://scale-mart1.vercel.app/resetPassword/${user._id}/${token}`
+        text: `Click on this link to reset your password: /resetPassword/${user._id}/${token}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

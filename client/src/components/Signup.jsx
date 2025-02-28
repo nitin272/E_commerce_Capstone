@@ -1,14 +1,17 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; 
+import { useSpring, animated } from '@react-spring/web';
+import logo from '../assets/logo.png';
+import { TextField, InputAdornment, IconButton } from '@mui/material/';
+import { Visibility, VisibilityOff, Email, LockOpen, Person, ShoppingCart } from '@mui/icons-material';
+import LoginIcon from '@mui/icons-material/Login';
+import { toast, Toaster } from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import { FcGoogle } from 'react-icons/fc';
+import { requestPermission } from '../Service/Firebase';
 
-import { Button, TextField, InputAdornment, IconButton } from '@mui/material/';
-import { Visibility, VisibilityOff, Google, PermIdentity, Lock, Token } from '@mui/icons-material';
-import { Login } from '@mui/icons-material';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { requestPermission, saveFcmToken } from '../Service/Firebase';
+import LoadingSpinner from './Loading';
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,226 +20,471 @@ const Signup = () => {
   const [otp, setOtp] = useState('');
   const [otpGenerated, setOtpGenerated] = useState(false);
   const [validOtp, setValidOTP] = useState('');
-  const [error, setError] = useState('');
-  const [warn, setWarn] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = 'https://e-commerce-capstone.onrender.com';
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  // React Spring animations
+  const fadeIn = useSpring({
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'translateY(0)' },
+    config: { tension: 280, friction: 20 }
+  });
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+  const scaleIn = useSpring({
+    from: { scale: 0 },
+    to: { scale: 1 },
+    config: { tension: 200, friction: 12 }
+  });
 
-  const onSignupBtn = (e) => {
-    e.preventDefault();
-    if (otpGenerated) {
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-      if (password === confirmPassword) {
-        if (passwordRegex.test(password)) {
-          axios.post(`${apiUrl}/signup`, {
-            name,
-            username: email,
-            password,
-            otp,
-            validOtp,
-            fcmToken: Token,
-          }).then(res => {
-            localStorage.setItem("id", res.data._id);
-            navigate('/');
-          }).catch(error => {
-            toast.error(error.response.data);
-          });
-        } else {
-          toast.error('Password must be at least 8 characters long and contain at least one letter, one number, and one special character.');
-        }
-      } else {
-        toast.error('Passwords do not match.');
-      }
-    } else {
-      toast.error('Please generate OTP.');
+  // Add this particle initialization function
+
+  const generateOtp = async () => {
+    if (!email) {
+      toast.error('Please enter your email first');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await axios.post(`${apiUrl}/otpVerification`, { email });
+      setValidOTP(res.data.validOTP);
+      setOtpGenerated(true);
+      toast.success('OTP sent to your email');
+    } catch (err) {
+      toast.error('Failed to generate OTP');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const generateOtp = () => {
-    setValidOTP('');
-    if (email) {
-      axios.post(`${apiUrl}/otpVerification`, { email })
-        .then(res => {
-          setValidOTP(res.data.validOTP);
-          setOtpGenerated(true);
-          toast.info('OTP sent to your email');
-        }).catch(err => {
-          toast.error('Failed to generate OTP. Please try again.');
-          console.log(err);
-        });
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${apiUrl}/signup`, {
+        name,
+        username: email,
+        password,
+        otp,
+        validOtp
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.user) {
+        toast.success('Account created successfully! 🎉');
+        navigate('/');
+      } else {
+        toast.error('Signup failed - Invalid response');
+      }
+    } catch (error) {
+      toast.error(error.response?.data || 'Signup failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const googleSignup = async () => {
-  
     const token = await requestPermission();
-    console.log("token form frontend googel login",token);
+    console.log("token form frontend googel login", token);
   
     window.open(`${apiUrl}/auth/google/callback?fcmToken=${token}`, "_self");
   };
-  
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar newestOnTop closeOnClick rtl pauseOnFocusLoss draggable pauseOnHover />
-      <div className="flex flex-col items-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-8 bg-white rounded-lg shadow-lg">
-        <img src={logo} alt="Logo" className="mx-auto h-24 mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Scale Mart</h1>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+     
 
-        {error &&
-          <toast.error>{error}</toast.error>
-        }
-
-        {warn &&
-          <toast.info>{warn}</toast.info>
-        }
-
-        <h2 className="text-3xl font-light mb-4 text-center">Sign Up</h2>
-
-        <form onSubmit={onSignupBtn} className="flex flex-col space-y-4 w-full max-w-md">
-          <TextField
-            type="text"
-            name="name"
-            required
-            placeholder="Enter your name"
-            label="Name"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <PermIdentity />
-                </InputAdornment>
-              )
-            }}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <TextField
-            type="email"
-            name="email"
-            required
-            placeholder="Enter your email"
-            label="Email"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    onClick={() => generateOtp()}
-                  >
-                    Generate OTP
-                  </Button>
-                </InputAdornment>
-              )
-            }}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <TextField
-            type={showPassword ? 'text' : 'password'}
-            name="password"
-            required
-            placeholder="Enter your password"
-            label="Password"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={togglePasswordVisibility} edge="end">
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <TextField
-            type={showConfirmPassword ? 'text' : 'password'}
-            name="confirmPassword"
-            required
-            placeholder="Confirm your password"
-            label="Confirm Password"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={toggleConfirmPasswordVisibility} edge="end">
-                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-
-          {otpGenerated &&
-            <TextField
-              type="text"
-              name="otp"
-              required
-              placeholder="Enter OTP"
-              label="OTP"
-              variant="outlined"
-              size="small"
-              className='h-12'
-              onChange={(e) => setOtp(e.target.value)}
-            />
-          }
-
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            endIcon={<Login />}
-            className="w-full"
-          >
-            Sign Up
-          </Button>
-        </form>
-
-        <div className="flex items-center justify-center mt-4">
-          <hr className="flex-grow border-gray-300" />
-          <span className="mx-4 text-gray-500">Or</span>
-          <hr className="flex-grow border-gray-300" />
-        </div>
-
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          startIcon={<Google />}
-          onClick={googleSignup}
-          className="w-full mt-4"
+      <animated.div style={fadeIn} className="relative z-10 w-full max-w-md p-6">
+        <motion.div
+          className="bg-white/10 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.25)] border border-white/20 p-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          Continue with Google
-        </Button>
+          <motion.div
+            className="flex flex-col items-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.div
+              className="relative"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <img src={logo} alt="Scale Mart" className="h-28 w-auto mb-2 drop-shadow-2xl" />
+              <ShoppingCart className="absolute -right-2 -bottom-2 text-pink-400 text-3xl transform rotate-12" />
+            </motion.div>
+            
+            <h1 className="text-4xl font-bold mt-4 mb-2 bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+              Scale Mart
+            </h1>
+            <p className="text-gray-300 mb-8 text-center">
+              Create your account
+            </p>
+          </motion.div>
 
-        <p className="text-sm mt-4 text-center">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blue-500">
-            Login
-          </Link>
-        </p>
-      </div>
+          <form onSubmit={handleSignup} className="space-y-4">
+            <TextField
+              fullWidth
+              label="Full Name"
+              variant="outlined"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person className="text-purple-300" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '1rem',
+                  color: 'white',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                  '&.Mui-focused fieldset': { 
+                    borderColor: '#e879f9',
+                    borderWidth: '2px'
+                  },
+                  '& input': {
+                    '&:-webkit-autofill': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset',
+                      'WebkitTextFillColor': 'white',
+                      'transition': 'background-color 5000s ease-in-out 0s',
+                      'backgroundColor': 'transparent !important'
+                    },
+                    '&:-webkit-autofill:hover': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:focus': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:active': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    }
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
+            />
+
+            <div className="relative">
+              <TextField
+                fullWidth
+                label="Email Address"
+                variant="outlined"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email className="text-purple-300" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '1rem',
+                    color: 'white',
+                    paddingRight: '110px',
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '&.Mui-focused fieldset': { 
+                      borderColor: '#e879f9',
+                      borderWidth: '2px'
+                    },
+                    '& input': {
+                      '&:-webkit-autofill': {
+                        'WebkitBoxShadow': '0 0 0 1000px transparent inset',
+                        'WebkitTextFillColor': 'white',
+                        'transition': 'background-color 5000s ease-in-out 0s',
+                        'backgroundColor': 'transparent !important'
+                      },
+                      '&:-webkit-autofill:hover': {
+                        'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                      },
+                      '&:-webkit-autofill:focus': {
+                        'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                      },
+                      '&:-webkit-autofill:active': {
+                        'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                      }
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(255, 255, 255, 0.7)'
+                  }
+                }}
+              />
+              <motion.button
+                type="button"
+                onClick={generateOtp}
+                disabled={isLoading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-lg
+                  bg-purple-500/20 hover:bg-purple-500/30 
+                  text-purple-200 text-sm font-medium
+                  transition-all duration-300
+                  z-10"
+              >
+                {isLoading ? 'Sending...' : 'Get OTP'}
+              </motion.button>
+            </div>
+
+            {otpGenerated && (
+              <TextField
+                fullWidth
+                label="OTP"
+                variant="outlined"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '1rem',
+                    color: 'white',
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '&.Mui-focused fieldset': { 
+                      borderColor: '#e879f9',
+                      borderWidth: '2px'
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                  },
+                }}
+              />
+            )}
+
+            <TextField
+              fullWidth
+              label="Password"
+              variant="outlined"
+              type={showPassword ? 'text' : 'password'}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOpen className="text-purple-300" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      className="text-purple-300"
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '1rem',
+                  color: 'white',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                  '&.Mui-focused fieldset': { 
+                    borderColor: '#e879f9',
+                    borderWidth: '2px'
+                  },
+                  '& input': {
+                    '&:-webkit-autofill': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset',
+                      'WebkitTextFillColor': 'white',
+                      'transition': 'background-color 5000s ease-in-out 0s',
+                      'backgroundColor': 'transparent !important'
+                    },
+                    '&:-webkit-autofill:hover': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:focus': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:active': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    }
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              variant="outlined"
+              type={showConfirmPassword ? 'text' : 'password'}
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOpen className="text-purple-300" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                      className="text-purple-300"
+                    >
+                      {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '1rem',
+                  color: 'white',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                  '&.Mui-focused fieldset': { 
+                    borderColor: '#e879f9',
+                    borderWidth: '2px'
+                  },
+                  '& input': {
+                    '&:-webkit-autofill': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset',
+                      'WebkitTextFillColor': 'white',
+                      'transition': 'background-color 5000s ease-in-out 0s',
+                      'backgroundColor': 'transparent !important'
+                    },
+                    '&:-webkit-autofill:hover': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:focus': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    },
+                    '&:-webkit-autofill:active': {
+                      'WebkitBoxShadow': '0 0 0 1000px transparent inset'
+                    }
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
+            />
+
+            <motion.button
+              type="submit"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`
+                w-full py-4 px-6 rounded-xl font-medium text-white
+                bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500
+                hover:from-purple-600 hover:via-fuchsia-600 hover:to-pink-600
+                transition-all duration-300 shadow-lg hover:shadow-xl
+                flex items-center justify-center gap-2
+                ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}
+              `}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <LoadingSpinner />
+                  <span>Creating Account...</span>
+                </div>
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <LoginIcon />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-transparent text-gray-400">Or continue with</span>
+            </div>
+          </div>
+
+          <motion.button
+            type="button"
+            onClick={googleSignup}
+            whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            whileTap={{ scale: 0.98 }}
+            className="
+              w-full py-4 px-6 rounded-xl font-medium
+              bg-white/5 backdrop-blur-md
+              border border-white/20 hover:border-white/40
+              text-white transition-all duration-300
+              flex items-center justify-center gap-3
+              shadow-lg hover:shadow-xl
+            "
+          >
+            <FcGoogle className="w-6 h-6" />
+            <span>Continue with Google</span>
+          </motion.button>
+
+          <motion.p 
+            className="mt-8 text-center text-sm text-gray-400"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="font-medium text-purple-400 hover:text-purple-300 transition-colors duration-300"
+            >
+              Sign In
+            </Link>
+          </motion.p>
+        </motion.div>
+      </animated.div>
       
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1e1e1e',
+            color: '#fff',
+            borderRadius: '1rem',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#a855f7',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 };
