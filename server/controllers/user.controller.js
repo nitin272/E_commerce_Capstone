@@ -89,7 +89,7 @@ static Login = async (req, res) => {
                 username,
                 password: hashedPassword,
     
-                fcmTokens: fcmToken ? [fcmToken] : [],
+                fcmTokens: typeof fcmToken === 'string' ? [fcmToken] : [],
             });
 
 
