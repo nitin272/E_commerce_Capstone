@@ -409,7 +409,6 @@ const Home = () => {
         <DialogTitle sx={{ 
           fontWeight: 700, 
           textAlign: 'center', 
-          color: '#333',
           background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
           color: 'white',
           py: 3
