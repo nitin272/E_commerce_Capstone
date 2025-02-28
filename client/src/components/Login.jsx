@@ -9,8 +9,6 @@ import LoginIcon from '@mui/icons-material/Login';
 import { toast, Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -32,56 +30,7 @@ const Login = () => {
     config: { tension: 200, friction: 12 }
   });
 
-  const particlesInit = async (main) => {
-    await loadFull(main);
-  };
-
-  const particlesConfig = {
-    particles: {
-      number: { value: 30, density: { enable: true, value_area: 800 } },
-      color: { value: "#6366f1" },
-      shape: {
-        type: "circle",
-        stroke: { width: 0, color: "#000000" },
-      },
-      opacity: {
-        value: 0.3,
-        random: false,
-        animation: { enable: true, speed: 1, minimumValue: 0.1, sync: false }
-      },
-      size: {
-        value: 3,
-        random: true,
-        animation: { enable: true, speed: 2, minimumValue: 0.1, sync: false }
-      },
-      links: {
-        enable: true,
-        distance: 150,
-        color: "#6366f1",
-        opacity: 0.2,
-        width: 1
-      },
-      move: {
-        enable: true,
-        speed: 1,
-      }
-    }
-  };
-
-  const loginBlockParticlesConfig = {
-    ...particlesConfig,
-    particles: {
-      ...particlesConfig.particles,
-      number: { value: 15, density: { enable: true, value_area: 400 } },
-      color: { value: "#ffffff" },
-      size: { value: 2 },
-      links: {
-        ...particlesConfig.particles.links,
-        color: "#ffffff",
-        opacity: 0.1
-      }
-    }
-  };
+ 
 
   const onLoginBtn = async (e) => {
     e.preventDefault();

@@ -10,8 +10,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
 import { requestPermission } from '../Service/Firebase';
-import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
+
 import LoadingSpinner from './Loading';
 const Signup = () => {
   const [name, setName] = useState('');
@@ -41,9 +40,6 @@ const Signup = () => {
   });
 
   // Add this particle initialization function
-  const particlesInit = useCallback(async engine => {
-    await loadFull(engine);
-  }, []);
 
   const generateOtp = async () => {
     if (!email) {
@@ -102,92 +98,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        options={{
-          fullScreen: {
-            enable: false,
-            zIndex: 0
-          },
-          background: {
-            color: {
-              value: "transparent",
-            },
-          },
-          fpsLimit: 60,
-          interactivity: {
-            events: {
-              onClick: {
-                enable: true,
-                mode: "push",
-              },
-              onHover: {
-                enable: true,
-                mode: "repulse",
-              },
-              resize: true,
-            },
-            modes: {
-              push: {
-                quantity: 4,
-              },
-              repulse: {
-                distance: 100,
-                duration: 0.4,
-              },
-            },
-          },
-          particles: {
-            color: {
-              value: "#ffffff",
-            },
-            links: {
-              color: "#ffffff",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1,
-            },
-            collisions: {
-              enable: true,
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: {
-                default: "bounce",
-              },
-              random: false,
-              speed: 1,
-              straight: false,
-            },
-            number: {
-              density: {
-                enable: true,
-                area: 800,
-              },
-              value: 80,
-            },
-            opacity: {
-              value: 0.3,
-            },
-            shape: {
-              type: "circle",
-            },
-            size: {
-              value: { min: 1, max: 3 },
-            },
-          },
-          detectRetina: true,
-        }}
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: 0
-        }}
-      />
+     
 
       <animated.div style={fadeIn} className="relative z-10 w-full max-w-md p-6">
         <motion.div
