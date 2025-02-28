@@ -3,10 +3,25 @@ import Navbar from './Navbar';
 import Footer from './footer.jsx';
 import { Typewriter } from 'react-simple-typewriter';
 import axios from 'axios';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import { Login } from '@mui/icons-material';
-import { Login as LoginIcon } from '@mui/icons-material'; 
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, CircularProgress } from '@mui/material';
+import { Login, ShoppingCart, Category, Star } from '@mui/icons-material';
 import Logo from '../assets/supermarket.jpg';
+import { motion } from 'framer-motion';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectCards, EffectFade, Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-cards';
+import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { useInView } from 'react-intersection-observer';
+import { Tilt } from 'react-tilt';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import Lottie from 'lottie-react';
+import shoppingAnimation from '../assets/animations/shopping.json';
+import loadingAnimation from '../assets/animations/loading.json';
+import emptyAnimation from '../assets/animations/empty.json';
 
 const Home = () => {
   const [userName, setUserName] = useState('Guest');
@@ -19,15 +34,16 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAll, setShowAll] = useState(false);
 
-  const apiUrl = 'https://e-commerce-capstone.onrender.com';
+  
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
   const bgImages = [
     {
-      img: Logo,
       content: 'Shop Precision, Shop Scalemart',
       line: 'Your one-stop destination for reliable and quality products.',
     }
   ];
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -57,6 +73,26 @@ const Home = () => {
     fetchProducts();
   }, []);
 
+  // Initialize AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  }, []);
+
+  const defaultTiltOptions = {
+    reverse: false,
+    max: 15,
+    perspective: 1000,
+    scale: 1.05,
+    speed: 1000,
+    transition: true,
+    axis: null,
+    reset: true,
+    easing: "cubic-bezier(.03,.98,.52,.99)",
+  };
+
  const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     if (category === 'All') {
@@ -68,12 +104,12 @@ const Home = () => {
   };
 
   const handleLogin = () => {
-    window.location.href = 'https://scale-mart1.vercel.app/login';
+    window.location.href = 'http://localhost:4500/login';
   };
 
   const handleProductClick = (product) => {
     if (isLoggedIn) {
-      window.location.href = `https://scale-mart1.vercel.app/products/${product._id}`;
+      window.location.href = `http://localhost:4500/products/${product._id}`;
     } else {
       setDialogOpen(true); 
     }
@@ -87,193 +123,342 @@ const Home = () => {
   const handleShowMoreToggle = () => {
     setShowAll(!showAll);
   };
+
+  // Add animation options
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
   return (
     <div className="overflow-hidden" style={{ marginTop: '12vh' }}>
       <Navbar option="" />
 
+      {/* Updated Welcome Section without Logo */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative min-h-[80vh] bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-20">
+          <Lottie 
+            animationData={shoppingAnimation}
+            options={defaultOptions}
+            className="w-full h-full"
+          />
+        </div>
+        <div className="relative z-10 container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[80vh]">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-3xl"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Welcome Back, {userName}! 🎉
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-8">
+              Discover amazing deals curated just for you
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+              onClick={() => handleCategoryClick('All')}
+            >
+              Start Shopping
+            </motion.button>
+          </motion.div>
+        </div>
+      </motion.div>
 
-      <div className="bg-gray-100 py-4 text-center">
-        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-blue-600">
-          Hi {userName}, Welcome Back!
-        </h1>
+      {/* Featured Products Carousel */}
+      <div className="py-16 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Featured Products
+              </span>
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"/>
+          </motion.div>
+          
+          <Swiper
+            effect="cards"
+            grabCursor={true}
+            modules={[EffectCards, Autoplay]}
+            className="w-full md:w-3/4 lg:w-1/2 mx-auto"
+            autoplay={{ delay: 3000 }}
+          >
+            {products.slice(0, 5).map((product) => (
+              <SwiperSlide key={product._id}>
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <img
+                    src={product.productImgUrls[0]}
+                    alt={product.productName}
+                    className="w-full h-64 object-cover"
+                  />
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold mb-2">{product.productName}</h3>
+                    <p className="text-gray-600 mb-4">{product.category}</p>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => handleProductClick(product)}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
 
-     <div
-        style={{
-          backgroundImage: `url(${bgImages[0].img})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          transition: 'background-image 1s ease-in-out',
-        }}
-        className="relative bg-no-repeat bg-center h-[40vh] md:h-[60vh] lg:h-[70vh]"
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/80"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white p-4 md:p-8 lg:p-12 rounded-lg">
-            <h1 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold mb-2 md:mb-4">
-              <Typewriter
-                words={[bgImages[0].content]}
-                cursor
-                cursorStyle="|"
-                typeSpeed={65}
-                deleteSpeed={40}
-                delaySpeed={500}
-                loop
-              />
-            </h1>
-            <p className="text-sm md:text-lg lg:text-xl font-serif font-semibold leading-relaxed">
-              {bgImages[0].line}
+      {/* Enhanced Categories Section */}
+      <div className="bg-white py-16" data-aos="fade-up">
+        <div className="w-full md:w-4/5 lg:w-3/5 mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-3xl font-semibold text-gray-800 mb-3">
+              Explore Our Categories
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"/>
+          </motion.div>
+          
+          <motion.div 
+            className="flex flex-wrap justify-center gap-4 pb-4"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ staggerChildren: 0.1 }}
+          >
+            {displayedCategories.map((category, index) => (
+              <motion.button
+                key={index}
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+                whileTap={{ scale: 0.95 }}
+                className={`py-3 px-8 font-medium rounded-full transition duration-300 ${
+                  selectedCategory === category 
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                    : 'bg-white text-gray-800 border-2 border-gray-200 hover:border-blue-400'
+                }`}
+                onClick={() => handleCategoryClick(category)}
+              >
+                <Category className="mr-2" sx={{ fontSize: 20 }} />
+                {category}
+              </motion.button>
+            ))}
+          </motion.div>
+          
+          {categories.length > 6 && (
+            <motion.div 
+              className="text-center mt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Button
+                onClick={handleShowMoreToggle}
+                variant="outlined"
+                color="primary"
+                className="hover:bg-blue-50"
+                endIcon={showAll ? <Star /> : <Category />}
+              >
+                {showAll ? 'Show Less Categories' : 'Explore More Categories'}
+              </Button>
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Enhanced Loading State with Custom Animation */}
+      {loading && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl"
+          >
+            <Lottie 
+              animationData={loadingAnimation}
+              options={defaultOptions}
+              className="w-64 h-64 mx-auto"
+            />
+            <p className="text-center text-lg font-medium text-gray-700 mt-4">
+              Loading amazing products...
             </p>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Enhanced Empty State with Animation */}
+      {!loading && filteredProducts.length === 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-20 bg-gray-50"
+        >
+          <div className="w-72 h-72">
+            <Lottie 
+              animationData={emptyAnimation}
+              options={defaultOptions}
+            />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-800 mt-6">No Products Found</h3>
+          <p className="text-gray-600 mt-2 mb-6">Try selecting a different category</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleCategoryClick('All')}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            View All Products
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* Enhanced Products Grid with Glass Effect */}
+      {!loading && filteredProducts.length > 0 && (
+        <div className="bg-gradient-to-b from-gray-50 to-white py-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  {selectedCategory === 'All' ? 'Featured Products' : `${selectedCategory} Collection`}
+                </span>
+              </h2>
+              <div className="w-32 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mx-auto rounded-full"/>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative"
+                >
+                  <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
+                    <div className="aspect-w-1 aspect-h-1 w-full">
+                      <img
+                        src={product.productImgUrls[0]}
+                        alt={product.productName}
+                        className="w-full h-full object-cover object-center transform transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+                        {product.productName}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-3">{product.category}</p>
+                      <div className="flex justify-end">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleProductClick(product)}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                        >
+                          View Details
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-
-
-      <div className="bg-white py-12">
-        <div className="w-full md:w-4/5 lg:w-3/5 mx-auto">
-          <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">
-            Explore Our Categories
-          </h2>
-          <p className="text-lg text-gray-600 text-center mb-6 px-4 sm:px-0">
-            Find the right product for your needs from our wide selection of categories.
-          </p>
-
-
-       <div className="pb-4">
-      <div className="flex flex-wrap justify-start gap-4">
-        {displayedCategories.map((category, index) => (
-          <button
-            key={index}
-            className={`py-2 px-6 font-medium rounded-lg transition duration-200 ${
-              selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'
-            }`}
-            onClick={() => handleCategoryClick(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {categories.length > 6 && (
-        <div className="mt-4">
-          <button
-            className="py-2 px-4 font-medium text-blue-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200"
-            onClick={handleShowMoreToggle}
-          >
-            {showAll ? 'Show Less' : 'Show More'}
-          </button>
-        </div>
       )}
-    </div>  
-        </div>
-      </div>
 
-
-      {!isLoggedIn && (
-        <div className="text-center mt-10">
-          <button
+      {/* Enhanced Dialog */}
+      <Dialog 
+        open={dialogOpen} 
+        onClose={handleCloseDialog} 
+        fullWidth 
+        maxWidth="sm"
+        PaperProps={{
+          className: "rounded-xl"
+        }}
+      >
+        <DialogTitle sx={{ 
+          fontWeight: 700, 
+          textAlign: 'center', 
+          color: '#333',
+          background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+          color: 'white',
+          py: 3
+        }}>
+          Login Required
+        </DialogTitle>
+        <DialogContent sx={{ paddingTop: '24px', paddingBottom: '24px' }}>
+          <Typography variant="body1" sx={{ color: '#555', textAlign: 'center' }}>
+            To explore more details and make purchases, please log in to your account.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={handleCloseDialog}
+            color="secondary"
+            variant="outlined"
+            sx={{
+              padding: '10px 20px',
+              fontWeight: '600',
+              borderRadius: '8px',
+              '&:hover': {
+                backgroundColor: '#f4f4f4',
+              },
+            }}
+            disabled={loading}
+          >
+            Maybe Later
+          </Button>
+          <Button
             onClick={handleLogin}
-            className="py-3 px-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xl font-semibold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out"
+            variant="contained"
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Login />}
+            sx={{
+              padding: '10px 20px',
+              fontWeight: '600',
+              borderRadius: '8px',
+              background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+              '&:hover': {
+                background: 'linear-gradient(to right, #2563eb, #7c3aed)',
+              },
+            }}
+            disabled={loading}
           >
-            Log In to Start Shopping
-          </button>
-        </div>
-      )}
-
-      
-
-      <div className="w-full md:w-11/12 lg:w-10/12 mx-auto py-8 px-4 bg-gray-50 bg-[black],">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-blue-900 text-center mb-10">
-          {selectedCategory === 'All' ? 'Featured Products' : `Products in ${selectedCategory}`}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {filteredProducts.map((product) => (
-            <div
-              key={product._id}
-              className="bg-white shadow-lg rounded-xl hover:shadow-2xl transition-shadow relative overflow-hidden"
-            >
-              <div className="w-full h-52 overflow-hidden rounded-t-xl">
-                <img
-                  src={product.productImgUrls[0] || 'default-image-url'}
-                  alt={product.productName}
-                  style={{
-                    width: '100%',
-                    height: 200,
-                    objectFit: 'contain',
-                    backgroundColor: '#f5f5f5',
-                    transition: 'transform 0.3s',
-                  }}
-                  onMouseEnter={(e) => (e.target.style.transform = 'scale(1.1)')}
-                  onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
-                />
-              </div>
-              <div className="p-5">
-                <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1">
-                  {product.productName}
-                </h3>
-                <p className="text-sm text-gray-500 mb-4 line-clamp-1">{product.category}</p>
-                <p className="text-xl font-extrabold text-gray-900 mb-4">₹{product.price}</p>
-                <button
-                  onClick={() => handleProductClick(product)}
-                  className="absolute bottom-4 right-4 py-2 px-4 bg-purple-600 text-white text-xs font-bold rounded-lg hover:bg-purple-700 shadow-lg transition-colors"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            {loading ? 'Logging in...' : 'Log In Now'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Footer />
-
-
-
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-  <DialogTitle sx={{ fontWeight: 600, textAlign: 'center', color: '#333', paddingBottom: '10px' }}>
-    Please log in first
-  </DialogTitle>
-  <DialogContent sx={{ paddingTop: '10px', paddingBottom: '20px' }}>
-    <Typography variant="body1" sx={{ marginBottom: '20px', color: '#555' }}>
-      You need to be logged in to view more information or make inquiries. Would you like to log in now?
-    </Typography>
-  </DialogContent>
-  <DialogActions sx={{ padding: '10px' }}>
-    <Button
-      onClick={handleCloseDialog}
-      color="secondary"
-      variant="outlined"
-      sx={{
-        padding: '8px 16px',
-        fontWeight: '600',
-        '&:hover': {
-          backgroundColor: '#f4f4f4',
-        },
-      }}
-      disabled={loading}
-    >
-      Cancel
-    </Button>
-    <Button
-      onClick={handleLogin}
-      color="primary"
-      variant="contained"
-      startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
-      sx={{
-        padding: '8px 16px',
-        fontWeight: '600',
-        backgroundColor: '#3f51b5',
-        '&:hover': {
-          backgroundColor: '#303f9f',
-        },
-      }}
-      disabled={loading}
-    >
-      {loading ? 'Logging in...' : 'Log In'}
-    </Button>
-  </DialogActions>
-</Dialog>
-
     </div>
   );
 };

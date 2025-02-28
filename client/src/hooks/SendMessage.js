@@ -3,7 +3,7 @@ import axios from "axios"
 const SendMessage = () => {
     const {messages,selectedConversation, setMessages,conversation_Id, setConversationId} = useConversation()
 
-    const apiUrl  = import.meta.env.VITE_APP_API_URL
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
     const sendMessage = async (newMessage,user)=>{
         try {
             const response = await axios.post(`${apiUrl}/message/send/${selectedConversation._id}`,{

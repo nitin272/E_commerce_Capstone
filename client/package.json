@@ -27,7 +27,7 @@
     "jwt-decode": "^4.0.0",
     "npm": "^10.8.2",
     "query-string": "^9.1.0",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-alice-carousel": "^2.9.1",
     "react-bootstrap": "^2.10.4",
     "react-cookie-consent": "^9.0.0",
@@ -43,6 +43,7 @@
     "react-toastify": "^10.0.6",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.7.5",
+    "spring": "^0.0.0",
     "swiper": "^11.1.5",
     "yup": "^1.4.0",
     "zustand": "^4.5.2"

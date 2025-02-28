@@ -1,5 +1,8 @@
-import React, { useEffect, useState, forwardRef } from 'react';
+import React, { useEffect, useState, forwardRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSpring, animated } from '@react-spring/web';
+import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
 import logo from "../assets/logo.png";
 import axios from 'axios';
 import {
@@ -7,7 +10,7 @@ import {
   useMediaQuery, BottomNavigation, BottomNavigationAction, Menu, MenuItem, Box,
 } from '@mui/material';
 import {
-  Category, Chat, AccountCircle, Logout, Login, ContactMail, Home, Dashboard,ArrowDropDown,
+  Category, Chat, AccountCircle, Logout, Login, ContactMail, Home, Dashboard, ArrowDropDown, Menu as MenuIcon, ContactSupport,
 } from '@mui/icons-material';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -21,7 +24,7 @@ const Navbar = forwardRef(() => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isTablet = useMediaQuery('(max-width:960px)');
-  const apiUrl = 'https://e-commerce-capstone.onrender.com';
+  const apiUrl = "https://e-commerce-capstone.onrender.com";
 
   const toggleDrawer = (open) => (event) => {
     if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -88,315 +91,773 @@ const Navbar = forwardRef(() => {
     if (action === 'login') navigate('/login'); 
   };
   
-  
+  const fadeIn = useSpring({
+    from: { opacity: 0, transform: 'translateY(-20px)' },
+    to: { opacity: 1, transform: 'translateY(0)' },
+    config: { tension: 280, friction: 20 }
+  });
+
+  const particlesInit = async (main) => {
+    await loadFull(main);
+  };
+
+  const particlesConfig = {
+    particles: {
+      number: { 
+        value: 40, 
+        density: { 
+          enable: true, 
+          value_area: 1000 
+        } 
+      },
+      color: { 
+        value: ["#a855f7", "#e879f9", "#7c3aed"] 
+      },
+      shape: {
+        type: "circle",
+        stroke: { 
+          width: 0, 
+          color: "#000000" 
+        },
+      },
+      opacity: {
+        value: 0.3,
+        random: true,
+        animation: { 
+          enable: true, 
+          speed: 1, 
+          minimumValue: 0.1, 
+          sync: false 
+        }
+      },
+      size: {
+        value: 4,
+        random: true,
+        animation: { 
+          enable: true, 
+          speed: 2, 
+          minimumValue: 0.5, 
+          sync: false 
+        }
+      },
+      links: {
+        enable: true,
+        distance: 150,
+        color: "#a855f7",
+        opacity: 0.2,
+        width: 1,
+        triangles: {
+          enable: true,
+          opacity: 0.05
+        }
+      },
+      move: {
+        enable: true,
+        speed: 1,
+        direction: "none",
+        random: true,
+        straight: false,
+        outMode: "bounce",
+        attract: {
+          enable: true,
+          rotateX: 600,
+          rotateY: 1200
+        }
+      },
+      interactivity: {
+        detectsOn: "canvas",
+        events: {
+          onHover: {
+            enable: true,
+            mode: "grab"
+          },
+          onClick: {
+            enable: true,
+            mode: "push"
+          },
+          resize: true
+        },
+        modes: {
+          grab: {
+            distance: 140,
+            links: {
+              opacity: 0.5
+            }
+          },
+          push: {
+            particles_nb: 3
+          }
+        }
+      }
+    },
+    background: {
+      color: "transparent"
+    },
+    retina_detect: true
+  };
 
   return (
-    <div>
+    <div className="relative">
       <Toaster 
   position="top-center" 
   reverseOrder={false} 
 />
-      <div className='fixed top-0 left-0 right-0 flex justify-between items-center p-3 shadow-md w-full bg-white z-50'>
-        <div className='flex items-center cursor-pointer'>
-          <img src={logo} alt="logo" className={`h-12 object-cover mr-2 ${isTablet ? 'h-10' : 'h-16'}`} />
-          <Typography
-            variant="h5"
-            component="h4"
-            className={`text-xl ${isTablet ? 'text-lg' : 'text-2xl'} font-bold`}
-            sx={{ fontFamily: 'serif', color: '#001F2B' }}
-          >
-            Scale Mart
-          </Typography>
-        </div>
-
-        {!isMobile && (
-  <div className='flex items-center gap-x-3'>
-    {Object.keys(userData).length > 0 ? (
-      <>
-        <Button
-          variant='contained'
-          onClick={() => handleNavigate('/')}  
-          sx={{ textTransform: 'none', backgroundColor: '#4CAF50' }}  
-        >
-          <Home sx={{ mr: 1 }} /> Home
-        </Button>
-        <Button
-          variant='contained'
-          onClick={() => handleNavigate('/product')}
-          sx={{ textTransform: 'none', backgroundColor: '#007BFF' }}
-        >
-          <Category sx={{ mr: 1 }} /> Products
-        </Button>
-        <Button
-          variant='contained'
-          onClick={() => handleNavigate('/profile')}
-          sx={{ textTransform: 'none', backgroundColor: '#9c27b0' }}
-        >
-          <AccountCircle sx={{ mr: 1 }} /> Profile
-        </Button>
-        {isAdmin && (
-          <Button
-            variant='contained'
-            onClick={() => handleNavigate('/dashboard')}
-            sx={{ textTransform: 'none', backgroundColor: '#388E3C' }}
-          >
-            <Dashboard sx={{ mr: 1 }} /> Dashboard
-          </Button>
-        )}
-        <Button
-          variant='contained'
-          onClick={handleChatClick}
-          sx={{ textTransform: 'none', backgroundColor: '#FF9800' }}
-        >
-          <Chat sx={{ mr: 1 }} /> Chat
-        </Button>
-        <Button
-          variant='contained'
-          onClick={logout}
-          sx={{ textTransform: 'none', backgroundColor: '#F44336' }}
-        >
-          <Logout sx={{ mr: 1 }} /> Logout
-        </Button>
-      </>
-            ) : (
-              <>
-                <Button
-                  variant='contained'
-                  onClick={() => handleNavigate('/login')}
-                  sx={{ textTransform: 'none', backgroundColor: '#007BFF' }}
-                >
-                  <Login sx={{ mr: 1 }} /> Login
-                </Button>
-                <Button
-                  variant='contained'
-                  onClick={() => handleNavigate('/signup')}
-                  sx={{ textTransform: 'none', backgroundColor: '#6a1b9a' }}
-                >
-                  <Login sx={{ mr: 1 }} /> Sign-Up
-                </Button>
-              </>
-            )}
-          </div>
-        )}
-
-        {isMobile && (
-  <div className="flex items-center space-x-2">
-    <IconButton onClick={handleMenuOpen} aria-label="user menu">
-      {Object.keys(userData).length > 0 ? (
-        <div className="flex items-center space-x-1">
-          <Avatar alt="User Avatar" src={userData.ownerImg[0]} sx={{ width: 32, height: 32 }} />
-          <ArrowDropDown fontSize="large" />
-        </div>
-      ) : (
-        <Login fontSize="large" />
-      )}
-    </IconButton>
-
-    <Menu
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
-      onClose={handleMenuClose}
-      PaperProps={{
-        style: {
-          width: '200px',
-          backgroundColor: '#ffffff',
-          borderRadius: '8px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        },
-      }}
-    >
-     {Object.keys(userData).length > 0 ? (
-        <>
-          <MenuItem
-            onClick={() => handleNavigate('/profile')}
-            className="hover:bg-gray-100 transition duration-150"
-          >
-            <AccountCircle sx={{ color: '#FFA000', fontSize: '1.5rem' }} className="mr-2" />  {/* Yellow profile icon */}
-            Profile
-          </MenuItem>
-          {isAdmin && (
-            <MenuItem
-              onClick={() => handleNavigate('/dashboard')}
-              className="hover:bg-gray-100 transition duration-150"
-            >
-              <Dashboard sx={{ color: '#4CAF50', fontSize: '1.5rem' }} className="mr-2" />  {/* Green dashboard icon */}
-              Dashboard
-            </MenuItem>
-          )}
-          <MenuItem
-            onClick={logout}
-            className="hover:bg-gray-100 transition duration-150"
-          >
-            <Logout sx={{ color: '#D32F2F', fontSize: '1.5rem' }} className="mr-2" />  {/* Red logout icon */}
-            Logout
-          </MenuItem>
-        </>
-      ) : (
-        <MenuItem
-          onClick={() => handleNavigate('/login')}
-          className="hover:bg-gray-100 transition duration-150"
-        >
-          <Login sx={{ color: '#1976D2', fontSize: '1.5rem' }} className="mr-2" />  {/* Blue login icon */}
-          Login
-        </MenuItem>
-      )}
-    </Menu>
-  </div>
-)}
-</div>
-<Dialog
-  open={dialogOpen}
-  onClose={() => handleDialogClose('cancel')}
-  sx={{
-    '& .MuiPaper-root': {
-      padding: 4,
-      borderRadius: 3,
-      backgroundColor: '#ffffff',
-      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
-      maxWidth: '400px',
-      margin: 'auto',
-    },
-  }}
->
-  <DialogTitle>
-    <Typography
-      variant="h5"
-      sx={{
-        fontWeight: 'bold',
-        textAlign: 'center',
-        color: '#4a90e2',
-        mb: 1,
-      }}
-    >
-      Welcome to Chat
-    </Typography>
-  </DialogTitle>
-  <DialogContent>
-    <Box
-      textAlign="center"
-      sx={{
-        padding: 2,
-        borderRadius: 2,
-        backgroundColor: '#f7f9fc',
-        mb: 2,
-      }}
-    >
-      <Typography
-        variant="body1"
-        sx={{
-          color: '#333',
-          fontSize: '1rem',
-          lineHeight: 1.5,
-        }}
-      >
-        To continue chatting, please log in to your account.
-      </Typography>
-    </Box>
-  </DialogContent>
-  <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
-    <Button
-      onClick={() => handleDialogClose('cancel')}
-      variant="outlined"
-      color="secondary"
-      sx={{
-        borderColor: '#d9534f',
-        color: '#d9534f',
-        fontWeight: 'bold',
-        px: 3,
-        py: 1,
-        '&:hover': {
-          backgroundColor: '#fef2f2',
-          borderColor: '#d9534f',
-        },
-      }}
-    >
-      Cancel
-    </Button>
-    <Button
-      onClick={() => handleDialogClose('login')}
-      variant="contained"
-      sx={{
-        backgroundColor: '#4a90e2',
-        fontWeight: 'bold',
-        px: 3,
-        py: 1,
-        '&:hover': {
-          backgroundColor: '#3a78c3',
-        },
-      }}
-    >
-      Login
-    </Button>
-  </DialogActions>
-</Dialog>
-
-      {isMobile && (
-  <BottomNavigation
-    showLabels
-    value={value}
-    onChange={(event, newValue) => setValue(newValue)}
-    className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-300"
-  >
-    <BottomNavigationAction
-      label="Home"
-      icon={<Home />}
-      onClick={() => handleNavigate('/')}
-      sx={{
-        color: '#1976D2', 
-        '&.Mui-selected': {
-          color: '#1565C0', 
-        },
-        '&:hover': {
-          color: '#1565C0', 
-        },
-      }}
-    />
-    <BottomNavigationAction
-      label="Chat"
-      icon={<Chat />}
-      onClick={handleChatClick}
-      sx={{
-        color: '#4CAF50', 
-        '&.Mui-selected': {
-          color: '#388E3C', 
-        },
-        '&:hover': {
-          color: '#388E3C', 
-        },
-      }}
-    />
-    <BottomNavigationAction
-      label="Products"
-      icon={<Category />}
-      onClick={() => handleNavigate('/product')}
-      sx={{
-        color: '#FF9800', 
-        '&.Mui-selected': {
-          color: '#F57C00', 
-        },
-        '&:hover': {
-          color: '#F57C00', 
-        },
-      }}
-    />
-    {isAdmin && (
-      <BottomNavigationAction
-        label="Dashboard"
-        icon={<Dashboard />}
-        onClick={() => handleNavigate('/dashboard')}
-        sx={{
-          color: '#9C27B0', 
-          '&.Mui-selected': {
-            color: '#7B1FA2', 
-          },
-          '&:hover': {
-            color: '#7B1FA2', 
-          },
+      <Particles
+        id="tsparticles-nav"
+        init={particlesInit}
+        options={particlesConfig}
+        className="absolute inset-0 z-0 h-screen"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%'
         }}
       />
-    )}
-  </BottomNavigation>
-)}
+
+      <animated.div style={fadeIn} className='fixed top-0 left-0 right-0 z-50'>
+        <div className='flex justify-between items-center p-4 bg-gradient-to-r from-slate-900/90 via-purple-900/90 to-slate-900/90 backdrop-blur-md border-b border-white/10 shadow-2xl'>
+          <div className='flex items-center cursor-pointer' onClick={() => handleNavigate('/')}>
+            <img 
+              src={logo} 
+              alt="logo" 
+              className={`h-12 object-cover mr-3 ${isTablet ? 'h-10' : 'h-14'} hover:scale-105 transition-transform duration-300`} 
+            />
+            <Typography
+              variant="h5"
+              component="h4"
+              className={`text-xl ${isTablet ? 'text-lg' : 'text-2xl'} font-bold`}
+              sx={{ 
+                fontFamily: 'serif', 
+                background: 'linear-gradient(to right, #fff, #e879f9)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: '0 0 20px rgba(232, 121, 249, 0.3)',
+              }}
+            >
+              Scale Mart
+            </Typography>
+          </div>
+
+          {!isMobile && (
+            <div className='flex items-center gap-x-4'>
+              {Object.keys(userData).length > 0 ? (
+                <>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleNavigate('/')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Home sx={{ mr: 1 }} /> Home
+                  </Button>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleNavigate('/product')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Category sx={{ mr: 1 }} /> Products
+                  </Button>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleNavigate('/contact')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <ContactSupport sx={{ mr: 1 }} /> Contact Us
+                  </Button>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleNavigate('/profile')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <AccountCircle sx={{ mr: 1 }} /> Profile
+                  </Button>
+                  {isAdmin && (
+                    <Button
+                      variant='contained'
+                      onClick={() => handleNavigate('/dashboard')}
+                      sx={{
+                        textTransform: 'none',
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: '0.8rem',
+                        border: '1px solid rgba(168, 85, 247, 0.2)',
+                        color: 'white',
+                        fontWeight: '500',
+                        padding: '8px 16px',
+                        letterSpacing: '0.5px',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                        },
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      <Dashboard sx={{ mr: 1 }} /> Dashboard
+                    </Button>
+                  )}
+                  <Button
+                    variant='contained'
+                    onClick={handleChatClick}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Chat sx={{ mr: 1 }} /> Chat
+                  </Button>
+                  <Button
+                    variant='contained'
+                    onClick={logout}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '0.8rem',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 16px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(168, 85, 247, 0.2))',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Logout sx={{ mr: 1 }} /> Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleNavigate('/login')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'linear-gradient(to right, #9333ea, #e879f9)',
+                      borderRadius: '0.8rem',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '8px 20px',
+                      letterSpacing: '0.5px',
+                      boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
+                      '&:hover': {
+                        background: 'linear-gradient(to right, #7e22ce, #d946ef)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 6px 15px rgba(168, 85, 247, 0.4)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Login sx={{ mr: 1 }} /> Login
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    onClick={() => handleNavigate('/signup')}
+                    sx={{
+                      textTransform: 'none',
+                      background: 'transparent',
+                      borderRadius: '0.8rem',
+                      border: '2px solid rgba(168, 85, 247, 0.5)',
+                      color: 'white',
+                      fontWeight: '500',
+                      padding: '7px 19px',
+                      letterSpacing: '0.5px',
+                      '&:hover': {
+                        background: 'rgba(168, 85, 247, 0.1)',
+                        borderColor: '#a855f7',
+                        transform: 'translateY(-2px)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Login sx={{ mr: 1 }} /> Sign-Up
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+
+          {isMobile && (
+            <IconButton 
+              onClick={toggleDrawer(true)}
+              sx={{ 
+                color: 'white',
+                background: 'rgba(168, 85, 247, 0.2)',
+                backdropFilter: 'blur(10px)',
+                '&:hover': {
+                  background: 'rgba(168, 85, 247, 0.3)',
+                  transform: 'scale(1.05)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+        </div>
+      </animated.div>
+
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+        PaperProps={{
+          sx: {
+            width: '280px',
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(88, 28, 135, 0.95))',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+          }
+        }}
+      >
+        <Box sx={{ width: '100%', color: 'white' }}>
+          {Object.keys(userData).length > 0 && (
+            <Box sx={{ 
+              p: 3, 
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'linear-gradient(to right, rgba(147, 51, 234, 0.2), rgba(232, 121, 249, 0.2))',
+            }}>
+              <div className="flex items-center space-x-3">
+                <Avatar 
+                  src={userData.ownerImg?.[0]} 
+                  alt="User Avatar"
+                  sx={{ 
+                    width: 50, 
+                    height: 50,
+                    border: '2px solid rgba(168, 85, 247, 0.5)',
+                    boxShadow: '0 0 15px rgba(168, 85, 247, 0.3)',
+                  }}
+                />
+                <div>
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      fontWeight: 'bold',
+                      color: 'white',
+                      textShadow: '0 0 10px rgba(168, 85, 247, 0.5)',
+                    }}
+                  >
+                    {userData.name || 'User'}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {userData.email}
+                  </Typography>
+                </div>
+              </div>
+            </Box>
+          )}
+
+          <List sx={{ pt: 2 }}>
+            <ListItem 
+              button 
+              onClick={() => handleNavigate('/')}
+              sx={{ 
+                py: 2,
+                px: 3,
+                mb: 1,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                },
+                borderRadius: '0.5rem',
+                mx: 1,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <Home sx={{ mr: 2, color: '#e879f9' }} />
+              <Typography sx={{ 
+                color: 'white',
+                fontWeight: '500',
+                letterSpacing: '0.5px',
+              }}>
+                Home
+              </Typography>
+            </ListItem>
+
+            <ListItem 
+              button 
+              onClick={() => handleNavigate('/product')}
+              sx={{ 
+                py: 2,
+                px: 3,
+                mb: 1,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                },
+                borderRadius: '0.5rem',
+                mx: 1,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <Category sx={{ mr: 2, color: '#e879f9' }} />
+              <Typography sx={{ 
+                color: 'white',
+                fontWeight: '500',
+                letterSpacing: '0.5px',
+              }}>
+                Products
+              </Typography>
+            </ListItem>
+
+            <ListItem 
+              button 
+              onClick={() => handleNavigate('/contact')}
+              sx={{ 
+                py: 2,
+                px: 3,
+                mb: 1,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                },
+                borderRadius: '0.5rem',
+                mx: 1,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <ContactSupport sx={{ mr: 2, color: '#e879f9' }} />
+              <Typography sx={{ 
+                color: 'white',
+                fontWeight: '500',
+                letterSpacing: '0.5px',
+              }}>
+                Contact Us
+              </Typography>
+            </ListItem>
+
+            {Object.keys(userData).length > 0 ? (
+              <>
+                <ListItem 
+                  button 
+                  onClick={() => handleNavigate('/profile')}
+                  sx={{ 
+                    py: 2,
+                    px: 3,
+                    mb: 1,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                    },
+                    borderRadius: '0.5rem',
+                    mx: 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <AccountCircle sx={{ mr: 2, color: '#e879f9' }} />
+                  <Typography sx={{ 
+                    color: 'white',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Profile
+                  </Typography>
+                </ListItem>
+
+                <ListItem 
+                  button 
+                  onClick={handleChatClick}
+                  sx={{ 
+                    py: 2,
+                    px: 3,
+                    mb: 1,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                    },
+                    borderRadius: '0.5rem',
+                    mx: 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Chat sx={{ mr: 2, color: '#e879f9' }} />
+                  <Typography sx={{ 
+                    color: 'white',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Chat
+                  </Typography>
+                </ListItem>
+
+                {isAdmin && (
+                  <ListItem 
+                    button 
+                    onClick={() => handleNavigate('/dashboard')}
+                    sx={{ 
+                      py: 2,
+                      px: 3,
+                      mb: 1,
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                      },
+                      borderRadius: '0.5rem',
+                      mx: 1,
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Dashboard sx={{ mr: 2, color: '#e879f9' }} />
+                    <Typography sx={{ 
+                      color: 'white',
+                      fontWeight: '500',
+                      letterSpacing: '0.5px',
+                    }}>
+                      Dashboard
+                    </Typography>
+                  </ListItem>
+                )}
+
+                <ListItem 
+                  button 
+                  onClick={logout}
+                  sx={{ 
+                    py: 2,
+                    px: 3,
+                    mb: 1,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                    },
+                    borderRadius: '0.5rem',
+                    mx: 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Logout sx={{ mr: 2, color: '#e879f9' }} />
+                  <Typography sx={{ 
+                    color: 'white',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Logout
+                  </Typography>
+                </ListItem>
+              </>
+            ) : (
+              <>
+                <ListItem 
+                  button 
+                  onClick={() => handleNavigate('/login')}
+                  sx={{ 
+                    py: 2,
+                    px: 3,
+                    mb: 1,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                    },
+                    borderRadius: '0.5rem',
+                    mx: 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Login sx={{ mr: 2, color: '#e879f9' }} />
+                  <Typography sx={{ 
+                    color: 'white',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Login
+                  </Typography>
+                </ListItem>
+
+                <ListItem 
+                  button 
+                  onClick={() => handleNavigate('/signup')}
+                  sx={{ 
+                    py: 2,
+                    px: 3,
+                    mb: 1,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1))',
+                    },
+                    borderRadius: '0.5rem',
+                    mx: 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Login sx={{ mr: 2, color: '#e879f9' }} />
+                  <Typography sx={{ 
+                    color: 'white',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Sign-Up
+                  </Typography>
+                </ListItem>
+              </>
+            )}
+          </List>
+        </Box>
+      </Drawer>
+
+      <Dialog
+        open={dialogOpen}
+        onClose={() => handleDialogClose('cancel')}
+        sx={{
+          '& .MuiPaper-root': {
+            padding: 4,
+            borderRadius: 3,
+            backgroundColor: '#ffffff',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+            maxWidth: '400px',
+            margin: 'auto',
+          },
+        }}
+      >
+        <DialogTitle>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              textAlign: 'center',
+              color: '#4a90e2',
+              mb: 1,
+            }}
+          >
+            Welcome to Chat
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box
+            textAlign="center"
+            sx={{
+              padding: 2,
+              borderRadius: 2,
+              backgroundColor: '#f7f9fc',
+              mb: 2,
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#333',
+                fontSize: '1rem',
+                lineHeight: 1.5,
+              }}
+            >
+              To continue chatting, please log in to your account.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+          <Button
+            onClick={() => handleDialogClose('cancel')}
+            variant="outlined"
+            color="secondary"
+            sx={{
+              borderColor: '#d9534f',
+              color: '#d9534f',
+              fontWeight: 'bold',
+              px: 3,
+              py: 1,
+              '&:hover': {
+                backgroundColor: '#fef2f2',
+                borderColor: '#d9534f',
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleDialogClose('login')}
+            variant="contained"
+            sx={{
+              backgroundColor: '#4a90e2',
+              fontWeight: 'bold',
+              px: 3,
+              py: 1,
+              '&:hover': {
+                backgroundColor: '#3a78c3',
+              },
+            }}
+          >
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 });

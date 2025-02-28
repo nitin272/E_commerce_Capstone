@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: "1:1017488265671:web:1a5e22de48dfd4e5b849e2",
   measurementId: "G-FC92258EGT"
 };
-const apiUrl = 'https://e-commerce-capstone.onrender.com';
+const apiUrl = import.meta.env.VITE_APP_API_URL
 
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
