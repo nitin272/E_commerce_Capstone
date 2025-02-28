@@ -80,13 +80,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Background Particles */}
-      <Particles
-        id="tsparticles-bg"
-        init={particlesInit}
-        options={particlesConfig}
-        className="absolute inset-0"
-      />
-      
+     
       {/* Gradient Blobs */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute top-10 left-10 w-60 h-60 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
@@ -102,12 +96,7 @@ const Login = () => {
           transition={{ duration: 0.6 }}
         >
           {/* Login Block Particles */}
-          <Particles
-            id="tsparticles-login"
-            init={particlesInit}
-            options={loginBlockParticlesConfig}
-            className="absolute inset-0 z-0"
-          />
+       
 
           <div className="relative z-10">
             <animated.div style={scaleIn} className="flex flex-col items-center">
