@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     role: { type: String, default: 'user' },
     fcmTokens: { type: [String]}, 
     IsOnline: { type: Boolean, default: false }
+
 }, { timestamps: true });
 
 const userModel = mongoose.model('User', userSchema);
