@@ -64,7 +64,7 @@ auth.get('/auth/google/callback',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 // sameSite: "None"
             });
-            res.redirect('http://localhost:4500/');
+            res.redirect('https://scale-mart1.vercel.app/');
 
         } catch (error) {
             console.error(error);
