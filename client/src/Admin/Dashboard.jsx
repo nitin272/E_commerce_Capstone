@@ -78,7 +78,7 @@ const AdminPanel = () => {
     }
 
     return (
-        <Box className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+        <Box className="min-h-screen bg-gradient-to-br from-blue-50 to-white mt-14">
             <Navbar />
             
             <Container maxWidth="2xl" className="px-4 py-8">
