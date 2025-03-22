@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy, useEffect } from 'react';
 import axios from 'axios';
 import {
-    Button,
     Container,
     Box,
     Typography,
-    Divider,
     Tabs,
     Tab,
+    CircularProgress,
+    useTheme,
+    useMediaQuery,
     Paper,
+    Grid,
 } from '@mui/material';
 import { Person, Storefront, Dashboard as DashboardIcon } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import Lottie from 'lottie-react';
+// import dashboardAnimation from '../assets/dashboard.json';
+import loadingAnimation from '../assets/animations/loading.json';
 import Footer from '../components/footer.jsx';
 import Navbar from '../components/Navbar';
-import Users from './user';
-import Products from './ProductList';
+
+// Lazy load components with preloading
+const Users = lazy(() => import('./user'));
+const Products = lazy(() => import('./ProductList'));
 
 const AdminPanel = () => {
     const [selectedSection, setSelectedSection] = useState('users');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const [isLoading, setIsLoading] = useState(true);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
+
+    useEffect(() => {
+        // Simulate initial loading
+        const timer = setTimeout(() => setIsLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleEditProduct = async (productId, updatedData) => {
         try {
@@ -34,119 +49,133 @@ const AdminPanel = () => {
         setSelectedSection(newValue);
     };
 
+    // Enhanced loading component with Lottie animation
+    const LoadingComponent = () => (
+        <Box className="flex flex-col items-center justify-center min-h-[400px]">
+            <Lottie 
+                animationData={loadingAnimation} 
+                loop={true} 
+                style={{ width: 200, height: 200 }}
+            />
+            <Typography variant="body1" className="text-gray-600 mt-4">
+                Loading content...
+            </Typography>
+        </Box>
+    );
+
+    if (isLoading) {
+        return (
+            <Box className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+               
+                <Typography variant="h5" className="text-gray-700 mt-4">
+                    Welcome to Admin Dashboard
+                </Typography>
+                <Typography variant="body2" className="text-gray-500">
+                    Loading your workspace...
+                </Typography>
+            </Box>
+        );
+    }
+
     return (
-        <Box className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 mt-12">
+        <Box className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
             <Navbar />
             
-            <Container maxWidth="2xl" className="px-4 py-12">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+            <Container maxWidth="2xl" className="px-4 py-8">
+                {/* Dashboard Header - Enhanced */}
+                <Paper 
+                    elevation={0}
+                    className="p-6 mb-8 bg-white rounded-xl shadow-sm border border-gray-100"
                 >
-                    {/* Enhanced Dashboard Header */}
-                    <Box className="mb-12 text-center relative">
-                        <motion.div 
-                            className="absolute inset-0 -z-10"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 1 }}
-                        >
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl" />
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-purple-400/5 rounded-full blur-3xl" />
-                        </motion.div>
-                        
-                        <Box className="relative z-10">
+                    <Grid container spacing={3} alignItems="center">
+                        <Grid item xs={12} md={8}>
+                            <Box className="flex items-center gap-3 mb-2">
+                                <DashboardIcon className="text-blue-600 text-3xl" />
+                                <Typography 
+                                    variant="h4" 
+                                    className="text-2xl font-bold text-gray-800"
+                                >
+                                    Admin Dashboard
+                                </Typography>
+                            </Box>
                             <Typography 
-                                variant="h2" 
-                                className="text-6xl font-bold bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 bg-clip-text text-transparent mb-6"
+                                variant="body1" 
+                                className="text-gray-600"
                             >
-                                Admin Dashboard
+                                Manage your store efficiently with powerful tools and insights
                             </Typography>
-                            <Typography variant="h6" className="text-gray-600 max-w-2xl mx-auto font-light">
-                                Manage your store's products and users with powerful administrative tools
-                            </Typography>
-                        </Box>
-                    </Box>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <Box className="flex justify-end">
+                               
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Paper>
 
-                    {/* Modernized Navigation Tabs */}
-                    <Box className="mb-8 sticky top-20 z-50">
-                        <Tabs
-                            value={selectedSection}
-                            onChange={handleTabChange}
-                            variant="fullWidth"
-                            className="min-h-[72px]"
-                            TabIndicatorProps={{
-                                style: {
-                                    height: '3px',
-                                    borderRadius: '8px',
-                                    background: 'linear-gradient(to right, #2563eb, #7c3aed)',
-                                }
-                            }}
-                        >
-                            <Tab
-                                value="users"
-                                label={
-                                    <Box className="flex items-center gap-2">
-                                        <Person className="text-blue-600" />
-                                        <span>Users Management</span>
-                                    </Box>
-                                }
-                                className="transition-all duration-300"
-                                sx={{
-                                    textTransform: 'none',
-                                    fontSize: '1rem',
-                                    fontWeight: 500,
-                                    minHeight: 72,
-                                }}
-                            />
-                            <Tab
-                                value="products"
-                                label={
-                                    <Box className="flex items-center gap-2">
-                                        <Storefront className="text-purple-600" />
-                                        <span>Products Management</span>
-                                    </Box>
-                                }
-                                className="transition-all duration-300"
-                                sx={{
-                                    textTransform: 'none',
-                                    fontSize: '1rem',
-                                    fontWeight: 500,
-                                    minHeight: 72,
-                                }}
-                            />
-                        </Tabs>
-                    </Box>
+                {/* Navigation Tabs - Enhanced */}
+                <Paper 
+                    elevation={0}
+                    className="mb-8 bg-white rounded-xl shadow-sm border border-gray-100"
+                >
+                    <Tabs
+                        value={selectedSection}
+                        onChange={handleTabChange}
+                        variant={isMobile ? "fullWidth" : "standard"}
+                        className="min-h-[56px] px-4"
+                        sx={{
+                            '& .MuiTabs-flexContainer': {
+                                gap: 2,
+                            },
+                            '& .MuiTab-root': {
+                                minHeight: '56px',
+                                textTransform: 'none',
+                                fontSize: '1rem',
+                                fontWeight: 500,
+                                color: 'text.secondary',
+                                transition: 'all 0.3s ease',
+                                '&.Mui-selected': {
+                                    color: 'primary.main',
+                                    fontWeight: 600,
+                                    transform: 'translateY(-1px)',
+                                },
+                                '&:hover': {
+                                    color: 'primary.main',
+                                },
+                            },
+                        }}
+                    >
+                        <Tab
+                            value="users"
+                            label={
+                                <Box className="flex items-center gap-2">
+                                    <Person className="text-xl" />
+                                    <span className="hidden sm:inline">Users Management</span>
+                                </Box>
+                            }
+                        />
+                        <Tab
+                            value="products"
+                            label={
+                                <Box className="flex items-center gap-2">
+                                    <Storefront className="text-xl" />
+                                    <span className="hidden sm:inline">Products Management</span>
+                                </Box>
+                            }
+                        />
+                    </Tabs>
+                </Paper>
 
-                    {/* Content Section - Without Paper background */}
-                    <Box className="relative">
-                        <AnimatePresence mode="wait">
-                            {selectedSection === 'users' && (
-                                <motion.div
-                                    key="users"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.4, ease: "easeOut" }}
-                                >
-                                    <Users />
-                                </motion.div>
-                            )}
-                            {selectedSection === 'products' && (
-                                <motion.div
-                                    key="products"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.4, ease: "easeOut" }}
-                                >
-                                    <Products handleEditProduct={handleEditProduct} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </Box>
-                </motion.div>
+                {/* Content Section - Enhanced */}
+                <Paper 
+                    elevation={0}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                    <Suspense fallback={<LoadingComponent />}>
+                        {selectedSection === 'users' && <Users />}
+                        {selectedSection === 'products' && <Products handleEditProduct={handleEditProduct} />}
+                    </Suspense>
+                </Paper>
             </Container>
             
             <Footer />

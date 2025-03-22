@@ -50,7 +50,7 @@ const Products = () => {
     const [filteredNames, setFilteredNames] = useState([]);
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
 
     const fetchProducts = async () => {
         try {

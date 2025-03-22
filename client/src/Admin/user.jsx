@@ -1,315 +1,257 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Avatar,
-  Typography,
-  Box,
-  Button,
-  TextField,
-  Chip,
-  IconButton,
-  Tooltip,
-  Grid,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText
+    Container,
+    Box,
+    Typography,
+    Paper,
+    CircularProgress,
+    Avatar,
+    Chip,
+    Button,
+    Grid,
+    Card,
+    CardContent,
+    IconButton,
+    Tooltip,
+    TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
 } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ChatIcon from '@mui/icons-material/Chat';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SearchIcon from '@mui/icons-material/Search';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../components/Loading';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Message, Search, FilterList, Refresh, AdminPanelSettings, Person } from '@mui/icons-material';
-import toast from 'react-hot-toast';
 
 const Users = () => {
-  const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const apiUrl = import.meta.env.VITE_APP_API_URL;
-  const navigate = useNavigate();
-  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
-  const [filterRole, setFilterRole] = useState('all');
+    const [users, setUsers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [roleFilter, setRoleFilter] = useState('all');
+    const apiUrl = "https://e-commerce-capstone.onrender.com";
+    const navigate = useNavigate();
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/login/success`, { withCredentials: true });
-      setCurrentUser(response.data.user);
-    } finally {
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/users`, {
+                withCredentials: true
+            });
+            console.log('Fetched users:', response.data);
+            setUsers(response.data);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            toast.error('Error fetching users.');
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const filteredUsers = useMemo(() => {
+        return users.filter(user => {
+            const matchesSearch = searchQuery === '' || 
+                user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                user.username?.toLowerCase().includes(searchQuery.toLowerCase());
+            
+            const matchesRole = roleFilter === 'all' || 
+                user.role?.toLowerCase() === roleFilter.toLowerCase();
+            
+            return matchesSearch && matchesRole;
+        });
+    }, [users, searchQuery, roleFilter]);
+
+    const getRoleColor = (role) => {
+        switch (role?.toLowerCase()) {
+            case 'admin':
+                return 'error';
+            case 'user':
+                return 'primary';
+            default:
+                return 'default';
+        }
+    };
+
+    const getRoleIcon = (role) => {
+        switch (role?.toLowerCase()) {
+            case 'admin':
+                return <AdminPanelSettingsIcon />;
+            case 'user':
+                return <PersonIcon />;
+            default:
+                return <PersonIcon />;
+        }
+    };
+
+    const handleStartChat = (userId, username) => {
+        navigate('/chat', { state: { userId, username } });
+    };
+
+    if (isLoading) {
+        return (
+            <Box className="flex items-center justify-center min-h-[400px]">
+                <CircularProgress size={24} />
+            </Box>
+        );
     }
-  };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/users`, { withCredentials: true });
-      setUsers(response.data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCurrentUser();
-    fetchUsers();
-  }, []);
-
-  if (loading) return <Loading />;
-
-  if (users.length === 0) {
     return (
-      <Box padding={3}>
-        <Typography variant="h5">No users available.</Typography>
-      </Box>
-    );
-  }
-
-  const currentUserId = currentUser?._id;
-
-  const handleFilterClick = (event) => {
-    setFilterAnchorEl(event.currentTarget);
-  };
-
-  const handleFilterClose = () => {
-    setFilterAnchorEl(null);
-  };
-
-  const handleFilterSelect = (role) => {
-    setFilterRole(role);
-    handleFilterClose();
-    toast.success(`Filtered by ${role === 'all' ? 'all users' : role} role`);
-  };
-
-  const handleRefresh = async () => {
-    try {
-      setLoading(true);
-      await fetchUsers();
-      await fetchCurrentUser();
-      toast.success('User list refreshed successfully');
-    } catch (error) {
-      toast.error('Failed to refresh user list');
-    }
-  };
-
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRole = 
-      filterRole === 'all' || 
-      user.role.toLowerCase() === filterRole.toLowerCase();
-
-    return String(user._id) !== String(currentUser?._id) && matchesSearch && matchesRole;
-  });
-
-  const handleStartChat = (userId, username) => {
-    navigate('/chat', { state: { userId, username } });
-  };
-
-  return (
-    <Box className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      <Box className="container mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Enhanced Header Section */}
-          <Box className="mb-12 text-center relative">
-            <motion.div 
-              className="absolute inset-0 -z-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-            >
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl" />
-            </motion.div>
+        <Container maxWidth="lg" className="py-8">
+            <ToastContainer />
             
-            <Typography 
-              variant="h2" 
-              className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-4"
-            >
-              User Directory
-            </Typography>
-            <Typography variant="h6" className="text-gray-600 max-w-2xl mx-auto">
-              Manage and connect with our community members in one place
-            </Typography>
-          </Box>
-
-          {/* Updated Action Bar */}
-          <Box className="mb-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <Paper 
-              elevation={0}
-              className="flex-grow md:max-w-md p-2 bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50"
-            >
-              <Box className="flex items-center gap-3 px-3">
-                <Search className="text-gray-400" />
-                <TextField
-                  variant="standard"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  fullWidth
-                  InputProps={{
-                    disableUnderline: true,
-                    className: "text-lg"
-                  }}
-                />
-              </Box>
-            </Paper>
-            
-            <Box className="flex gap-2">
-              <Tooltip title="Refresh List">
-                <IconButton 
-                  onClick={handleRefresh}
-                  className="bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <Refresh />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Filter Users">
-                <IconButton 
-                  onClick={handleFilterClick}
-                  className="bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <FilterList />
-                </IconButton>
-              </Tooltip>
+            <Box className="mb-8">
+                <Typography variant="h4" className="font-bold text-gray-800 mb-2">
+                    Users Management
+                </Typography>
+                <Typography variant="subtitle1" className="text-gray-600">
+                    View and manage all registered users
+                </Typography>
             </Box>
 
-            {/* Filter Menu */}
-            <Menu
-              anchorEl={filterAnchorEl}
-              open={Boolean(filterAnchorEl)}
-              onClose={handleFilterClose}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              PaperProps={{
-                className: "mt-2 bg-white/90 backdrop-blur-lg"
-              }}
-            >
-              <MenuItem onClick={() => handleFilterSelect('all')}>
-                <ListItemIcon>
-                  <Person fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>All Users</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleFilterSelect('admin')}>
-                <ListItemIcon>
-                  <AdminPanelSettings fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Admins Only</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleFilterSelect('user')}>
-                <ListItemIcon>
-                  <Person fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Regular Users</ListItemText>
-              </MenuItem>
-            </Menu>
-          </Box>
-
-          <AnimatePresence mode="wait">
-            {loading ? (
-              <Loading />
-            ) : filteredUsers.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-16"
-              >
-                <Typography variant="h5" className="text-gray-600">
-                  No users found matching your criteria.
-                </Typography>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <TableContainer 
-                  component={Paper} 
-                  elevation={0}
-                  className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 overflow-hidden"
-                >
-                  <Table>
-                    <TableHead>
-                      <TableRow className="bg-gray-50/50">
-                        <TableCell className="font-semibold">Photo</TableCell>
-                        <TableCell className="font-semibold">Name</TableCell>
-                        <TableCell className="font-semibold">Email</TableCell>
-                        <TableCell className="font-semibold">Role</TableCell>
-                        <TableCell className="font-semibold">Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredUsers.map((user, index) => (
-                        <motion.tr
-                          key={user._id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          component={TableRow}
-                          className="hover:bg-gray-50/50 transition-colors duration-200"
-                        >
-                          <TableCell>
-                            <Avatar
-                              src={user.ownerImg[0]}
-                              alt={user.name}
-                              className="w-12 h-12 ring-2 ring-offset-2 ring-blue-100"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="subtitle1" className="font-medium">
-                              {user.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" className="text-gray-600">
-                              {user.username}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={user.role === 'admin' ? 'ADMIN' : 'USER'}
-                              color={user.role === 'admin' ? 'success' : 'primary'}
-                              variant="outlined"
-                              size="small"
-                              className="font-medium"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="contained"
-                              startIcon={<Message />}
-                              onClick={() => handleStartChat(user._id, user.username)}
-                              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white normal-case px-6 rounded-xl shadow-blue-200 shadow-lg hover:shadow-xl transition-all duration-300"
+            {/* Search and Filter Section */}
+            <Paper className="p-4 mb-6">
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} md={6}>
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            placeholder="Search by name or email..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon className="text-gray-400 mr-1" />,
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <FormControl fullWidth>
+                            <InputLabel>Filter by Role</InputLabel>
+                            <Select
+                                value={roleFilter}
+                                onChange={(e) => setRoleFilter(e.target.value)}
+                                label="Filter by Role"
                             >
-                              Chat
-                            </Button>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </Box>
-    </Box>
-  );
+                                <MenuItem value="all">All Roles</MenuItem>
+                                <MenuItem value="admin">Admin</MenuItem>
+                                <MenuItem value="user">User</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            {/* Results Count */}
+            <Box className="mb-4">
+                <Typography variant="body2" className="text-gray-600">
+                    Showing {filteredUsers.length} of {users.length} users
+                </Typography>
+            </Box>
+
+            {/* Users Grid */}
+            <Grid container spacing={3}>
+                {filteredUsers.map((user) => (
+                    <Grid item xs={12} sm={6} md={4} key={user._id}>
+                        <Card 
+                            className="h-full hover:shadow-lg transition-shadow duration-300"
+                            sx={{ 
+                                borderRadius: 2,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                            }}
+                        >
+                            <CardContent className="p-4">
+                                <Box className="flex items-start justify-between mb-4">
+                                    <Box className="flex items-center gap-3">
+                                        <Avatar 
+                                            src={user.ownerImg?.[0]} 
+                                            alt={user.name}
+                                            className="bg-blue-100 text-blue-600 w-12 h-12"
+                                        >
+                                            {user.name?.charAt(0)}
+                                        </Avatar>
+                                        <Box>
+                                            <Typography className="font-semibold text-gray-800">
+                                                {user.name}
+                                            </Typography>
+                                            <Chip
+                                                icon={getRoleIcon(user.role)}
+                                                label={user.role || 'User'}
+                                                color={getRoleColor(user.role)}
+                                                size="small"
+                                                className="mt-1"
+                                            />
+                                        </Box>
+                                    </Box>
+                                    <Tooltip title="Start Chat">
+                                        <IconButton
+                                            onClick={() => handleStartChat(user._id, user.name)}
+                                            className="bg-blue-50 hover:bg-blue-100"
+                                        >
+                                            <ChatIcon className="text-blue-600" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+
+                                <Box className="space-y-3">
+                                    <Box className="bg-blue-50 p-3 rounded-lg">
+                                        <Box className="flex items-center gap-2 mb-1">
+                                            <EmailIcon className="text-blue-500" fontSize="small" />
+                                            <Typography className="text-sm text-blue-600 font-medium">
+                                                Email Address
+                                            </Typography>
+                                        </Box>
+                                        <Typography className="text-blue-800 text-sm">
+                                            {user.email || user.username || 'No email available'}
+                                        </Typography>
+                                    </Box>
+
+                                    {user.phone && (
+                                        <Box className="bg-gray-50 p-3 rounded-lg">
+                                            <Box className="flex items-center gap-2 mb-1">
+                                                <PhoneIcon className="text-gray-500" fontSize="small" />
+                                                <Typography className="text-sm text-gray-600 font-medium">
+                                                    Phone Number
+                                                </Typography>
+                                            </Box>
+                                            <Typography className="text-gray-700 text-sm">
+                                                {user.phone}
+                                            </Typography>
+                                        </Box>
+                                    )}
+
+                                    {user.location && (
+                                        <Box className="bg-gray-50 p-3 rounded-lg">
+                                            <Box className="flex items-center gap-2 mb-1">
+                                                <LocationOnIcon className="text-gray-500" fontSize="small" />
+                                                <Typography className="text-sm text-gray-600 font-medium">
+                                                    Location
+                                                </Typography>
+                                            </Box>
+                                            <Typography className="text-gray-700 text-sm">
+                                                {user.location}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+    );
 };
 
 export default Users;
