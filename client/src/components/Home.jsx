@@ -104,12 +104,12 @@ const Home = () => {
   };
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:4500/login';
+    window.location.href = 'https://e-commerce-capstone.onrender.com/login';
   };
 
   const handleProductClick = (product) => {
     if (isLoggedIn) {
-      window.location.href = `http://localhost:4500/products/${product._id}`;
+      window.location.href = `https://e-commerce-capstone.onrender.com/products/${product._id}`;
     } else {
       setDialogOpen(true); 
     }
