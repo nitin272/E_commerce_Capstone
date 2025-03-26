@@ -101,7 +101,7 @@ const Product = () => {
                     `Could you please provide more details? Thank you! 🙏`;
 
                 const encodedMessage = encodeURIComponent(whatsappMessage);
-                const whatsappUrl = `https://wa.me/${9413262126}?text=${encodedMessage}`;
+                const whatsappUrl = `https://wa.me/${9509290112}?text=${encodedMessage}`;
                 window.open(whatsappUrl, '_blank');
             } catch (error) {
                 console.error('Error opening WhatsApp:', error);
