@@ -51,6 +51,8 @@ The backend will run on `http://localhost:9000`, and the frontend on `http://loc
 
 ---
 
+
+
 ## 📂 Project Structure
 ```
 /scale-mart
@@ -79,6 +81,9 @@ The backend will run on `http://localhost:9000`, and the frontend on `http://loc
 
 ---
 
+# Flow-Diagram
+![diagram](https://github.com/user-attachments/assets/bc0dac37-3ea3-400a-a707-a04c6d4db532)
+
 ## 💡 Future Roadmap
 🔜 **Order Tracking System** - Real-time status updates  
 🔜 **Discount & Coupon System** - Special offers for loyal customers  
@@ -91,4 +96,6 @@ The backend will run on `http://localhost:9000`, and the frontend on `http://loc
 For any inquiries or support, reach out to **[Support Email](mailto:support@nitin95092@gmail.com)**. 🚀
 
 👨‍💻 Developed by **[Nitin Soni]** | Follow us on [GitHub](https://github.com/nitin272) 🌟
+
+
 
